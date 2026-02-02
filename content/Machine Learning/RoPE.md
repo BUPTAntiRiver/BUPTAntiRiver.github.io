@@ -3,6 +3,7 @@ There are two main information of embedding positional information in transforme
 # Background Works
 
 An example of **absolute position** is the original work of attention is all you need.
+
 The **relative** case is they add a trainable relative positional embedding to both $f_{k}$ and $f_{v}$, which names $\tilde{p}_{r}^{k}$ and $\tilde{p}_{r}^{v}$ respectively, where $r=\text{clip}(m-n,r_{\min},r_{\max})$ represents the relative distance between position $m$ and $n$. They clipped the distance with the assumption that precise relative information is not useful beyond a certain distance.
 
 # Proposed Approach
@@ -52,5 +53,7 @@ R^{d}_{\Theta,m} =
 $$
 
 The big matrix above is of shape $d\times d$ and the $m$ in it is the position of the query or key to be processed, the query and key has shape $N\times d$, $N$ for sequence length, so we are applying a pair rotation to query and key, this is the essence of RoPE. Finding out such method is really impressive.
+
 Base on their evaluation, RoPE also can show the decay of $S$ with the relative distance $m-n$ increases by setting $\theta_{i}=10000^{-2i/d}$.
+
 If you really do the matrix multiplication you will get something looks like sine and cosine of $\theta_{i}-\theta_{j}$, which is exactly how we measure rotation of vectors.
