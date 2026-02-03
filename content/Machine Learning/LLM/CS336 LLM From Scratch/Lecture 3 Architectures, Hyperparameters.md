@@ -11,9 +11,10 @@ Most modern transformers don't have bias terms in order to use less memory and i
 
 ### Activations
 
-We have a whole zoo of activations now: ReLU, GeLU, SwiGLU, etc.
-What are they? What is the difference? Does it matter?
+We have a whole zoo of activations now: ReLU, GeLU, SwiGLU, etc. What are they? What is the difference? Does it matter?
+
 Most modern models used _gated activations_ (GLU).
+
 GLUs modify the first part of a feed forward layer:
 
 $$
@@ -27,12 +28,24 @@ $$
 $$
 
 This gives the gated variant, notice that we have an extra parameter $V$.
+
 So the difference between GeGLU and SwiGLU is that they use different function for non-linearity.
+
+I am going to present the activation used by SwiGLU here:
+
+$$
+\begin{align}
+\text{swish}(x)&=x\sigma(\beta x) \\
+\sigma (x)&= \frac{1}{1+e^{-x}}
+\end{align}
+$$
 
 ### Position Embedding
 
 Sine embedding, absolute embedding, relative embedding, etc.
-Nowadays, seems RoPE has won the game. Its idea is that we only care about the relative distance between two tokens, and it is very similar to inner product of two vectors, if the angle between two vectors stays the same, then their inner product won't change. They turn the offset of position into rotation, so that if the relative distance of two token does not change, their embedding relation won't change.
+
+Nowadays, seems RoPE has won the game. Its idea is that we only care about the relative distance between two tokens, and it is very similar to inner product of two vectors, if the angle between two vectors stays the same, then their inner product won't change. They turn the offset of position into rotation, so that if the relative distance of two token does not change, their embedding relation won't change. It makes the attention weight depending (only) on position distance.
+
 The rotation in 2 dimension is straight forward, but our token has huge embedding dimension, so the RoPE inventors find an simple way which is breaking down the token vector into pieces of 2 dimension and embed them separately.
 
 ### Attention Heads
