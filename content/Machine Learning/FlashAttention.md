@@ -18,17 +18,17 @@ Suppose sequence length $n$ and hidden size $d$, then $QK^T$ would be of size $n
 
 GPU has **three memory hierarchy**, from highest bandwidth to lowest are: GPU SRAM (20 MB), GPU HBM (40 GB) and MAIN MEMORY (>1 TB). This is the **IO cost** we should consider in real scene, which is the **bottleneck** of most operations in Transformer.
 We want to keep data in SRAM to achieve higher average bandwidth, but SRAM also has smallest size, so it won't be possible to store the whole K, V matrix in it. Instead, we choose to loop through blocks of **K**, **V** matrices.
-Flash attention enables **faster training** and **higher quality models (longer sequence length to hold)**.
+Flash attention enables **faster training** and **higher quality models (longer sequence length to hold, faster is better!)**.
 
 ## Background
 
 ### Kernel Fusion
 
-When there are multiple operations applied to the **same input**, the input can be loaded **once** from HBM, and the Compilers can automatically fuse many elementwise operations. However in the context of model training, the intermediate still need to be written to HBM to save for the backward process, so the **naive kernel fusion won't work very well**.
+When there are multiple operations applied to the **same input**, the input can be loaded **once** from HBM, and the Compilers can automatically fuse many element-wise operations. However in the context of model training, the intermediate still need to be written to HBM to save for the backward process, so the **naive kernel fusion won't work very well**.
 
 ## FlashAttention itself
 
-We want to compute with **fewer HBM IO** and **without storing large intermediate** matrices for the backward pass.
+We want to compute with **fewer HBM IO** and **without storing large intermediate** matrices for the backward pass. I will show the implementation detail of FlashAttention-2 later.
 
 ### Tiling and Recomputation
 
@@ -79,6 +79,24 @@ In forward pass, originally we split over $K,V$, now we split $Q$ across warps, 
 In backward pass, we also try to **avoid K-split**, but still requires some synchronization.
 
 Block size can also be tuned to achieve better performance.
+
+## Implementation
+
+### Forward Pass
+
+In forward pass, what we have are the input matrices $\mathbf{Q,K,V}\in \mathbb{R}^{N\times d}$ in HBM, and suppose block sizes are $B_{c},B_{r}$. Usually we take $\mathbf{Q}$ as rows, and $\mathbf{K,V}$ as cols.
+
+So now, we divide $\mathbf{Q,K,V}$ into corresponding blocks, and prepare the output space $\mathbf{O,L}$ for output and logsumexp (used in backward recompute). $\mathbf{O}$ has shape $\mathbb{R}^{N\times d}$ and is divided just like $\mathbf{Q}$, $\mathbf{L}$ has shape $\mathbb{R}^{N}$ so its tile shape is $B_{r}$.
+
+Then, for _each block_ of $\mathbf{Q}$, which is $\mathbf{Q}_{i}$, we load it from HBM to on-chip SRAM. After that, we initialize $\mathbf{O}_{i}^{(0)}=(0)_{B_{r}\times d}\in \mathbb{R}^{B_{r}\times d}, l_{i}^{(0)}=(0)_{B_{r}}\in \mathbb{R}^{B_{r}},m_{i}^{(0)}=(-\infty)_{B_{r}}\in \mathbb{R}^{B_{r}}$. The upper index stands for block indices of $\mathbf{K,V}$, and the lower one is $\mathbf{Q}$ row block index. $\mathbf{O}$ for output, $l$ for sum, $m$ for max.
+
+**Within the loop** of $\mathbf{Q}$, for _each block_ of $\mathbf{K,V}$, which is $\mathbf{K}_{j},\mathbf{V}_{j}$, we load them from HBM to chip. Compute the score $\mathbf{S}^{(j)}_{i}=\mathbf{Q}_{i}\mathbf{K}_{j}^\top$, and update global max $m_{i}^{(j)}=\max(m_{i}^{(j-1)},\text{rowsum}(\mathbf{S}_{i}^{(j)}))$, compute stable probability $\tilde{\mathbf{P}}_{i}^{(j)}=\exp(\mathbf{S}_{i}^{(j)}-m_{i}^{(j)})$.
+
+And also the running sum: $l_{i}^{(j)}=e^{m_{i}^{(j-1)}-m_{i}^{(j)}}l_{i}^{(j-1)}+\text{rowsum}(\tilde{\mathbf{P}}_{i}^{(j)})$, we scale the old sum with newest max value and add the new probabilities to it.
+
+Finally, on-chip, we compute the output $\mathbf{O}_{i}^{(j)}=\text{diag}(e^{m_{i}^{(j)}-m_{i}^{(j-1)}})^{-1}\mathbf{O}_{i}^{(j-1)}+\tilde{\mathbf{P}}_{i}^{(j)}\mathbf{V}_{j}$. Currently, it is not normalized, only after running through all the keys and values we can do the normalization.
+
+After finishing the _for loop over keys and values_, we compute $\mathbf{O}_{i}=\text{diag}(l_{i}^{(T_{c})})^{-1}\mathbf{O}_{i}^{(T_{c})}$, and logsumexp $L_{i}=m_{i}^{(T_{c})}+\log(l_{i}^{(T_{c})})$, and write them to HBM.
 
 # FlashAttention-3
 
