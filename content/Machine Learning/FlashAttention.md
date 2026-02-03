@@ -98,6 +98,8 @@ Finally, on-chip, we compute the output $\mathbf{O}_{i}^{(j)}=\text{diag}(e^{m_{
 
 After finishing the _for loop over keys and values_, we compute $\mathbf{O}_{i}=\text{diag}(l_{i}^{(T_{c})})^{-1}\mathbf{O}_{i}^{(T_{c})}$, and logsumexp $L_{i}=m_{i}^{(T_{c})}+\log(l_{i}^{(T_{c})})$, and write them to HBM.
 
+### Backward Pass
+
 # FlashAttention-3
 
 [Paper Link](http://arxiv.org/abs/2407.08608)
