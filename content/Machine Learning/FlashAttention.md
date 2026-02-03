@@ -40,6 +40,10 @@ _Recomputation_
 
 $S=QK^T$ and $P=\text{softmax}\left(  \frac{S}{\sqrt{ d }}  \right)$ are needed to compute gradients of $Q,K,V$, but we can recompute them with output $O$ and softmax normalization statistics $m,l$ in SRAM.
 
+### Why is FA better?
+
+For naive attention, when computing the score between $Q,K$, the hardware may just acts like tiling, but after it finished computation of 1 block of $Q$ and whole sequence of $K$, it will store the result and do the next $Q$, rather than what we are doing in the FA, which is keep computing local max and sum and doing updates, then compute output with loaded $V$. These are three separates steps in naive attention, so it will have at least 3 times of FA HBM access.
+
 ### Block-Sparse FlashAttention
 
 This implementation is a **approximate** attention. It has one predefined block sparsity matrix $M$, to mask out zero blocks.
