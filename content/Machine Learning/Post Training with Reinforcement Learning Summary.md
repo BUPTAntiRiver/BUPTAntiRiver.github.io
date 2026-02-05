@@ -23,7 +23,9 @@ $$
 $$
 
 we can transform the object with something like Lagrangian dual into a unconstrained problem.
+
 However solving for the divergence constraint is pretty hard and takes more computation time, so why do we need to constraint? It is designed to ensure the update of policy is not too big. We can imagine if there is no constraint and for a timestamp the advantage $A$ is very big, the policy will try it's best to maximize that action, especially when the old probability is pretty low. And then the training will be very unstable, so we need to divergence. And that is why PPO is very clever.
+
 Since our main purpose is to **reduce shift in objective**, PPO propose they will just clip objective directly. By doing so, they don't need to solve for the divergence which means faster speed, easier to implement and can still achieve a pretty good performance, stability and reliability.
 
 # DPO

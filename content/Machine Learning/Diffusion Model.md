@@ -1,4 +1,5 @@
-[lec5_diffusion.pdf](https://mit-6s978.github.io/assets/pdfs/lec5_diffusion.pdf)
+Resource: [lec5_diffusion.pdf](https://mit-6s978.github.io/assets/pdfs/lec5_diffusion.pdf)
+
 We are going to talk about four parts about diffusion model in this little article:
 
 - Forward process: add noise to data
@@ -9,6 +10,7 @@ We are going to talk about four parts about diffusion model in this little artic
 # What is Noise?
 
 Adding Gaussian noise to a data point equals to sampling $x\sim\mathcal{N}(x\mid x_{0},\sigma)$, for data distribution, we are doing a convolution (of PDF) between $p_{\text{data}}(x)$ and normal distribution.
+
 The process of adding noise is like doing convolution repeatedly until it becomes a noise distribution.
 
 # Forward Process
@@ -36,6 +38,7 @@ q(x_{t}\mid x_{0})&=\mathcal{N}(x_{t}\mid \sqrt{ \bar{\alpha}_{t} }x_{0}, (1-\ba
 $$
 
 $\beta_{t}$ is some function about $t$, it might be linear or cosine, etc.
+
 **In short**, forward process has predefined conditional distributions (schedule $\beta$), Gaussian with controllable mean and std, _divide_ and conquer strategy (time step)
 
 # Reverse Process
@@ -87,6 +90,7 @@ _In short_, we are forwarding with a single point but reverse needs the full dis
 ## Model Noise
 
 How to parameterize $p_{\theta}$ and let it learn $q(x_{t-1}\mid x_{t}, x_{0})$?
+
 We represent $p_{\theta}$ by Gaussian, train by minimizing KL divergence. $D_{\text{KL}}$ of two Gaussian is like L2 loss:
 
 $$
@@ -94,11 +98,17 @@ D_{\text{KL}} (\mathcal{N}_{1}\|\mathcal{N}_{2})=\log\left(  \frac{\sigma_{2}}{\
 $$
 
 The true parameterized part of $p_{\theta}$ is its mean, it estimates the _noise_ in $q$, and its var is a preset Gaussian.
+
 **\*Wait what?** We are learning the noise?\* Isn't the noise just Gaussian?
+
 Hold on, hold on. The noise here is no longer the noise we see in forward process, but they are close to each other. Let me dive into it.
+
 Remember we were doing sampling in the forward process right? So we are only doing $T$ times of sampling of Gaussian in the forward process, and we were also doing some linear combination, which means, the noise is different from pure Gaussian! Or we can say, pure Gaussian just never exists for finite operations. Just like we only have limited data set but never have knowledge about infinite world.
+
 So what we are actually doing in forward process is not simply adding Gaussian flavor to input, but adding biased noise to it, which makes its original value annihilate and only Gaussian noise remains. The real noise we applied is biased: consists of Gaussian and negative data point (may not be totally the same, so we need more data).
+
 Since then, the reverse process model totally makes sense! The var part is mainly responsible for the Gaussian part, and our mean, period, is responsible for the data building part. Such separation is already done in $q$, it has $\beta$ part acts as Gaussian.
+
 That's why we are estimating the noise, a trend towards ground truth is buried in it.
 
 ## Loss
@@ -125,6 +135,7 @@ $$
 $$
 
 Compare to VAE, we don't have parameter for $q$, but also have reconstruction loss in the end and L2 loss on noise.
+
 In the end we have:
 
 $$
@@ -136,12 +147,15 @@ $x_{0}$ over $p_{\text{data}}$, $t$ over $[1,T]$, $\epsilon$ over $\mathcal{N}(0
 # Noise Conditional Network
 
 Diffusion models decompose a distribution into **many** simpler ones. We need the same number of networks to fit **all** of them or we can **combine** all into one powerful network, this network is conditioned on noise level $t$.
+
 In the paper studied this, they just pass $x_{t}t$ into $\epsilon_{\theta}$ instead of only $x_{t}$.
 
 # Energy-based Models and Score Matching
 
 This part is kind of bonus......
+
 Diffusion Models are closely related to _Score Matching_. Score Matching is one solution to _Energy-based Models_.
+
 Energy-based Models:
 
 - can be probabilistic or non-probabilistic
@@ -152,7 +166,9 @@ Many useful concepts in diffusion co-evolved with score matching.
 ## Energy-based Models
 
 Define a _scalar_ function (output is scalar), called "energy".
+
 At _inference_ time, find $x$ that minimizes energy.
+
 We can use an energy to model a probability distribution:
 
 $$
@@ -168,6 +184,7 @@ $$
 ## Score Matching
 
 Instead of parameterizing $p$, we can parameterize the score, and learn data score with some kind of divergence.
+
 Really similar to Diffusion Model, we can also apply score matching to denoising, use it to match the negative biased noise.
 
 ### Langevin Dynamics
@@ -179,4 +196,5 @@ x_{t}\leftarrow x_{t-1}+ \frac{\sigma^{2}}{2}\nabla_{x}\log p_{\theta}(x_{t-1})+
 $$
 
 With $z_{t}\sim \mathcal{N}(0,1)$ then replace score function with energy gradient (don't forget negative).
-This also explains why we want to find the $x$ that minimizes energy, because with gradient descent, we are moving forward in reverse until reaching the lowest point which is also the minimal energy.[lec5_diffusion.pdf](https://mit-6s978.github.io/assets/pdfs/lec5_diffusion.pdf)
+
+This also explains why we want to find the $x$ that minimizes energy, because with gradient descent, we are moving forward in reverse until reaching the lowest point which is also the minimal energy.

@@ -100,6 +100,10 @@ After finishing the _for loop over keys and values_, we compute $\mathbf{O}_{i}=
 
 ### Backward Pass
 
+In backward pass, we have the inputs $\mathbf{Q,K,V}$ as well as output $\mathbf{O}$ and top down gradient $\mathbf{dO}$, they all have shape $\mathbb{R}^{N\times d}$ and live on HBM. Also we have logsumexp $L\in \mathbb{R}^{N}$ in HBM.
+
+This part is more straight forward in the paper. Comparing to the original paper, the main difference is in the way that it calculates, because we are storing only logsumexp in this version.
+
 # FlashAttention-3
 
 [Paper Link](http://arxiv.org/abs/2407.08608)

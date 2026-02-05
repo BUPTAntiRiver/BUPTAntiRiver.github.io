@@ -32,3 +32,4 @@ That is what the optimizer do, it will update all the parameters in your model. 
 
 ## Backward
 
+In backward, we need to make sure each node's parents all finished backward, so we need to do a topological sort over the graph. Which can be done with a post order depth-first-search.
