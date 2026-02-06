@@ -3,19 +3,25 @@ Reaches linear scaling in sequence length and fast inference, also achieves stat
 # Introduction
 
 The efficacy of self-attention is attributed to its ability to route information densely within a context window, allowing it to model complex data. However, this property brings fundamental drawbacks: an inability to model anything outside of a finite window, and quadratic scaling with respect to the window length.
+
 Recently (well at that time), structured state space sequence models (SSM) have emerged as a promising class of architectures for sequence modeling. It can be interpreted as a **combination** of recurrent neural networks (**RNN**) and convolution neural networks (**CNN**).
+
 In previous works, they have good performance in domains involving **continuous** signal data like **audio** and **vision**, but they don't have such one on modeling **discrete** and information-dense data such as **text**.
+
 They proposed **selective state space models**, a new class of methods, which has fast speed and Transformer like performance.
 
 ## Contributions
 
 **Selection Mechanism**. Enable the model to _select_ data in an input-dependent manner.
+
 **Hardware-aware Algorithm**. Does not materialize the expanded state in order to avoid IO access (like FA). It computes the model recurrently with a scan instead of convolution. Reaches real linear rather than pseudo-linear for convolution-based SSMs.
+
 **Architecture**. Mamba Out!
 
 # State Space Models
 
 Structured state space sequence models (S4) are a class of sequence models for deep learning that are broadly related to RNNs, and CNNs, and classical state space models.
+
 S4 models are defined with four parameters $(\Delta,A,B,C)$, which define a sequence-to-sequence transformation in two stages.
 
 ## Discretization
@@ -31,11 +37,13 @@ After the parameters have been transformed from $(\Delta,A,B,C)\mapsto(\bar{A},\
 ## Motivation: Selection as a Means of Compression
 
 They argue that a fundamental problem of sequence modeling is _compressing context into a smaller state_. For example, attention is effective but inefficient because it explicitly does not compress context at all. It needs to store the entire context (KV cache), cause it to have slow linear-time inference and quadratic-time training. While, recurrent models are efficient because they have a finite state, implying constant-time inference and linear-time training.
+
 The constant dynamics of $\bar{A},\bar{B}$ cannot let Linear Time Invariance (LTI) models select the correct information from their context, or affect the hidden state passed along the sequence in an input-dependent way. So they propose that a fundamental principle for building sequence models is **selectivity**.
 
 ## Improve SSMs with Selection
 
 Let model's parameters that affect interactions along the sequence be input-dependent.
+
 The main difference is simply making several parameters $\Delta,B,C$ functions of the input, along with associated changes to tensor shapes throughout. They add a length dimension $L$ to change the model from time-invariant to time-varying now.
 
 ## Efficient Implementation of Selective SSMs
