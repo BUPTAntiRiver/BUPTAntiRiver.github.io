@@ -1,6 +1,6 @@
 Models are too big, so we need multiple devices to train them.
 
-# Parallelization Methods
+# Strategies for Scalable Training
 
 ## Data Parallelism
 
@@ -36,6 +36,12 @@ For iteration i in T:
 So how can we describe the communication schemes used in DP? Broadcast then Reduce! But if we check the bandwidth requirement we will find out that each worker demands $O(1)$ while Parameter Server requires $O(N)$, this can be a **bottleneck**.
 
 Can we perform the aggregation without a central server? **ALL-REDUCE!** However naive All-Reduce will require $O(N)$ time and bandwidth on all workers, but we have better implementations like **Ring** and **Parallel Reduce**. Ring has $O(N)$ time and $O(1)$ bandwidth, Parallel Reduce has $O(1)$ time and $O(N^2)$ bandwidth. There is also a method called **Recursive Halving** which achieves $O(\log N)$ time.
+
+#### Ring All Reduce
+
+In **ring** all reduce, for example, if we want to aggregate the gradients, for $N$ workers we can separate all gradients into $N$ packs, and each worker passes their corresponding part to the next worker, after that, each worker passes the aggregated gradients and keeps doing this, which forms a ring-like trajectory.
+
+In the end, we do a **all gather** to make every worker has all of the gradients. In this case, each worker's load is only $B$ for gradient size $B$, rather than $NB$ for naive all reduce.
 
 ### DeepSpeed - Reducing Memory
 
