@@ -53,7 +53,7 @@ Single copy of data, but split the model across the GPU.
 
 We can imagine the naive implementation be like, we have 4 GPU, and they run forward 1 to 4 sequentially, then backward 4 to 1 sequentially, this works but will have huge amount of idle time, the utilization will be very low.
 
-How to improve? We can separate the batch into micro batches: $[16,10,512]\to 4*[4,10,512]$ this improves more working overlap, which elevates utilization from $25\%$ to around $57\%$.
+How to improve? We can separate the batch into micro batches: $[16,10,512]\to 4*[4,10,512]$ this improves more working overlap, because when the worker finished a micro batch and was sending it, it can keep processing the next micro batch, which elevates utilization from $25\%$ to around $57\%$.
 
 ## Tensor Parallelism
 
