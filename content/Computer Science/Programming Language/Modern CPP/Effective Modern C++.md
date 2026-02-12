@@ -141,8 +141,32 @@ Things to Remember
 - C++98-style `enums` are now known as unscoped `enums`.
 - Enumerators of scoped `enums` are visible only within the `enum`. They convert
   to other types only with a cast.
-- Both scoped and unscoped enums support specification of the underlying type.
+- Both scoped and unscoped `enums` support specification of the underlying type.
   The default underlying type for scoped `enums` is int. Unscoped `enums` have no
   default underlying type.
 - Scoped `enums` may always be forward-declared. Unscoped `enums` may be
   forward-declared only if their declaration specifies an underlying type.
+
+## Item 11: Prefer deleted functions to private undefined ones.
+
+Things to Remember
+
+- Prefer deleted functions to private undefined ones.
+- Any function may be deleted, including non-member functions and template
+  instantiations.
+
+## Item 12: Declare overriding functions `override`.
+
+Things to Remember
+
+- Declare overriding functions override.
+- Member function reference qualifiers make it possible to treat lvalue and
+  rvalue objects (\*this) differently.
+
+## Item 13: Prefer `const_iterator` to `iterator`.
+
+Things to Remember
+
+- Prefer `const_iterator`s to `iterator`s.
+- In maximally generic code, prefer non-member versions of `begin`, `end`,
+  `rbegin`, etc., over their member function counterparts.
