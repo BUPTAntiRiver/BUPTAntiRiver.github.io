@@ -139,34 +139,52 @@ Also if we want to use `MyAllocList` as a member of a template class, we need to
 Things to Remember
 
 - C++98-style `enums` are now known as unscoped `enums`.
-- Enumerators of scoped `enums` are visible only within the `enum`. They convert
-  to other types only with a cast.
-- Both scoped and unscoped `enums` support specification of the underlying type.
-  The default underlying type for scoped `enums` is int. Unscoped `enums` have no
-  default underlying type.
-- Scoped `enums` may always be forward-declared. Unscoped `enums` may be
-  forward-declared only if their declaration specifies an underlying type.
+- Enumerators of scoped `enums` are visible only within the `enum`. They convert to other types only with a cast.
+- Both scoped and unscoped `enums` support specification of the underlying type. The default underlying type for scoped `enums` is int. Unscoped `enums` have no default underlying type.
+- Scoped `enums` may always be forward-declared. Unscoped `enums` may be forward-declared only if their declaration specifies an underlying type.
 
 ## Item 11: Prefer deleted functions to private undefined ones.
 
 Things to Remember
 
 - Prefer deleted functions to private undefined ones.
-- Any function may be deleted, including non-member functions and template
-  instantiations.
+- Any function may be deleted, including non-member functions and template instantiations.
 
 ## Item 12: Declare overriding functions `override`.
 
 Things to Remember
 
 - Declare overriding functions override.
-- Member function reference qualifiers make it possible to treat lvalue and
-  rvalue objects (\*this) differently.
+- Member function reference qualifiers make it possible to treat lvalue and rvalue objects (\*this) differently.
 
 ## Item 13: Prefer `const_iterator` to `iterator`.
 
 Things to Remember
 
 - Prefer `const_iterator`s to `iterator`s.
-- In maximally generic code, prefer non-member versions of `begin`, `end`,
-  `rbegin`, etc., over their member function counterparts.
+- In maximally generic code, prefer non-member versions of `begin`, `end`, `rbegin`, etc., over their member function counterparts.
+
+## Item 14: Declare `noexcept` if functions won't emit exceptions.
+
+Things to Remember
+
+- `noexcept` is part of a function’s interface, and that means that callers may depend on it.
+- `noexcept` functions are more optimizable than non-`noexcept` functions.
+- `noexcept` is particularly valuable for the move operations, `swap`, memory deallocation functions, and destructors.
+- Most functions are exception-neutral rather than `noexcept`.
+
+## Item 15: Use `constexpr` whenever possible.
+
+Things to Remember
+
+- `constexpr` objects are const and are initialized with values known during compilation.
+- `constexpr` functions can produce compile-time results when called with arguments whose values are known during compilation.
+- `constexpr` objects and functions may be used in a wider range of contexts than non-`constexpr` objects and functions.
+- `constexpr` is part of an object's or function's interface.
+
+## Item 16: Make `const` member functions thread safe.
+
+Things to Remember
+
+- Make `const` member functions thread safe unless you're _certain_ they'll never be used in a concurrent context. We still need to pay attention to `const` member function concurrent safety because there might be _mutable_ members.
+- Use of `std::atomic` variables may offer better performance than a mutex, but they're suited for manipulation of only a single variable or memory location.
