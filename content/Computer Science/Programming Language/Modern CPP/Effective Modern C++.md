@@ -168,7 +168,7 @@ Things to Remember
 
 Things to Remember
 
-- `noexcept` is part of a function’s interface, and that means that callers may depend on it.
+- `noexcept` is part of a function's interface, and that means that callers may depend on it.
 - `noexcept` functions are more optimizable than non-`noexcept` functions.
 - `noexcept` is particularly valuable for the move operations, `swap`, memory deallocation functions, and destructors.
 - Most functions are exception-neutral rather than `noexcept`.
@@ -188,3 +188,35 @@ Things to Remember
 
 - Make `const` member functions thread safe unless you're _certain_ they'll never be used in a concurrent context. We still need to pay attention to `const` member function concurrent safety because there might be _mutable_ members.
 - Use of `std::atomic` variables may offer better performance than a mutex, but they're suited for manipulation of only a single variable or memory location.
+
+## Item 17: Understand special member function generation.
+
+The two copy operations are independent: declaring one doesn't prevent compilers from generating the other, but the two move operations are not independent. If we declare either, that prevents compiler from generating the other.
+
+Things to Remember
+
+- The special member functions are those compilers may generate on their own: default constructor, destructor, copy operations, and move operations.
+- Move operations are generated only for classes lacking explicitly declared move operations, copy operations, and a destructor.
+- The copy constructor is generated only for classes lacking an explicitly declared copy constructor, and it's deleted if a move operation is declared. The copy assignment operator is generated only for classes lacking an explicitly declared copy assignment operator, and it's deleted if a move operation is declared. Generation of the copy operations in classes with an explicitly declared destructor is deprecated.
+- Member function templates never suppress generation of special member functions.
+
+# Chapter 4 Smart Pointers
+
+Why a raw pointer is hard to love:
+
+1. Its declaration won't tell us whether it points to an _object_ or an _array_.
+2. Its declaration won't tell you whether you _should destroy_ what it points to or not.
+3. Even though we know we should destroy what the pointer points to, there's _no way to know how_. Should you use a `delete` or some function to handle that.
+4. Even though we know a `delete` is enough, we don't know whether to use single-object form `delete` or the array form `delete []`.
+5. Even though we know how to delete and what to delete, we still cannot make sure we perform the destruction _exactly once_.
+6. There is also no way to tell if the pointer dangles.
+
+So we have _smart pointers_, they are wrappers around raw pointers that act much like the raw pointers they wrap, but that avoid many of their pitfalls.
+
+There are different kinds of smart pointers like `std::unique_ptr`, `std::shared_ptr` and `std::weak_ptr`, they have different use and we should learn it.
+
+## Item 18: Use `std::unique_ptr` for exclusive-ownership resource management.
+
+`std::unique_ptr` is the closest to raw pointer, it performs exact the same for most of the instructions and is the same size as raw pointers. This means we can use them even in situations where memory and cycles are tight.
+
+`std::unique_ptr` embodies _exclusive ownership_ semantics, just as its name. We can apply move, which transfers ownership from the source pointer to the destination pointer. Copying a `std::unique_ptr` is not allowed, it is a _move-only_ type.
