@@ -235,3 +235,39 @@ Things to Remember
 - Compared to `std::unique_ptr`, `std::shared_ptr` objects are typically twice as big, incur overhead for control blocks, and require atomic reference count manipulations.
 - Default resource destruction is via delete, but custom deleters are supported. The type of the deleter has no effect on the type of the `std::shared_ptr`.
 - Avoid creating `std::shared_ptrs` from variables of raw pointer type.
+
+## Item 20: Use `weak_ptr` for `shared_ptr`-like pointers that can dangle.
+
+It can be convenient to have a pointer like `std::shared_ptr` that doesn't affect an object's reference count.
+
+If you check the weak pointer API, you will wonder how could a `std::weak_ptr` could be useful. Because it can't be dereferenced nor can they be tested for nullness. This is due to `std::weak_ptr` isn't a standalone smart pointer, it's an augmentation to `std::shared_ptr`. It is created from `std::shared_ptr`.
+
+We can use `std::weak_ptr<Widget> wpw(spw);` to create a weak pointer that points to the same object as the shared pointer. Then we can use `wpw.expired()` to check whether the pointer dangles. Why we can't dereference or test nullness of weak pointer is because the test and use _may have concurrency problem_, like not null for test but then being destroyed by the shared pointer and still try to use the weak pointer will have problem.
+
+Instead, we have an atomic operation: `wpw.lock()` which will test nullness and return a shared pointer to the object if not null else `nullptr`. Or you can use `std::weak_ptr` to construct a new `std::shared_ptr`, if expired, it will throw `std::bad_weak_ptr`.
+
+Things to Remember
+
+- Use `std::weak_ptr` for `std::shared_ptr`-like pointers that can dangle.
+- Potential use cases for `std::weak_ptr` include caching, observer lists, and the
+  prevention of `std::shared_ptr` cycles.
+
+## Item 21: Prefer `std::make_unique` and `std::make_shared` to direct use of `new`.
+
+Creation with `make` function and `new` is like:
+
+```cpp
+auto upw1(std::make_unique<Widget>());
+std::unique_ptr<Widget> upw2(new Widget);
+
+auto spw1(std::make_shared<Widget>());
+std::shared_ptr<Widget> spw2(new Widget);
+```
+
+With `make` function, we can reduce code duplication.
+
+Things to Remember
+
+- Compared to direct use of new, make functions eliminate source code duplication, improve exception safety, and, for `std::make_shared` and `std::allocate_shared`, generate code that's smaller and faster.
+- Situations where use of make functions is inappropriate include the need to specify custom deleters and a desire to pass braced initializers.
+- For `std::shared_ptr`s, additional situations where make functions may be ill-advised include (1) classes with custom memory management and (2) systems with memory concerns, very large objects, and `std::weak_ptr`s that outlive the corresponding `std::shared_ptr`s.
