@@ -271,3 +271,13 @@ Things to Remember
 - Compared to direct use of new, make functions eliminate source code duplication, improve exception safety, and, for `std::make_shared` and `std::allocate_shared`, generate code that's smaller and faster.
 - Situations where use of make functions is inappropriate include the need to specify custom deleters and a desire to pass braced initializers.
 - For `std::shared_ptr`s, additional situations where make functions may be ill-advised include (1) classes with custom memory management and (2) systems with memory concerns, very large objects, and `std::weak_ptr`s that outlive the corresponding `std::shared_ptr`s.
+
+## Item 22: When using the Pimpl Idiom, define special member functions in the implementation file.
+
+Pimpl means pointer to implementation.
+
+Things to Remember
+
+- The Pimpl Idiom decreases build times by reducing compilation dependencies between class clients and class implementations.
+- For `std::unique_ptr` pImpl pointers, declare special member functions in the class header, but implement them in the implementation file. Do this even if the default function implementations are acceptable.
+- The above advice applies to `std::unique_ptr`, but not to `std::shared_ptr`.
