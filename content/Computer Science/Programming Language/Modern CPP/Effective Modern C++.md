@@ -281,3 +281,15 @@ Things to Remember
 - The Pimpl Idiom decreases build times by reducing compilation dependencies between class clients and class implementations.
 - For `std::unique_ptr` pImpl pointers, declare special member functions in the class header, but implement them in the implementation file. Do this even if the default function implementations are acceptable.
 - The above advice applies to `std::unique_ptr`, but not to `std::shared_ptr`.
+
+# Chapter 5 Rvalue references, Move Semantics, and Perfect Forwarding
+
+It is important to bear in mind in this chapter that a parameter is always a lvalue, even if its type is a rvalue reference.
+
+## Item 23: Understand `std::move` and `std::forward`.
+
+Things to Remember
+
+- `std::move` performs an unconditional cast to an rvalue. In and of itself, it doesn't move anything.
+- `std::forward` casts its argument to an rvalue only if that argument is bound to an rvalue.
+- Neither `std::move` nor `std::forward` do anything at runtime.
