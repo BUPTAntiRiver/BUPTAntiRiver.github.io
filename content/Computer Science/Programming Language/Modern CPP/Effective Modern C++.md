@@ -322,3 +322,32 @@ Things to Remember
 
 - Overloading on universal references almost always leads to the universal reference overload being called more frequently than expected.
 - Perfect-forwarding constructors are especially problematic, because they're typically better matches than copy constructors for non-`const` lvalues, and they can hijack derived class calls to base class copy and move constructors.
+
+## Item 27: Familiarize yourself with alternatives to overloading on universal references.
+
+Things to Remember
+
+- Alternatives to the combination of universal references and overloading include the use of distinct function names, passing parameters by lvalue-reference-to-const, passing parameters by value, and using tag dispatch.
+- Constraining templates via `std::enable_if` permits the use of universal references and overloading together, but it controls the conditions under which compilers may use the universal reference overloads.
+- Universal reference parameters often have efficiency advantages, but they typically have usability disadvantages.
+
+## Item 28: Understand reference collapsing.
+
+Reference to reference is not allowed, but may be generated or deduced in practice scenario, so there are four possible _combinations_, which are lvalue to lvalue, lvalue to rvalue, rvalue to lvalue, and rvalue to rvalue. For these cases, the compiler will collapse into other cases, and the _rules_ are: **If either reference is an lvalue reference, the result is an lvalue reference. Otherwise, the result is an rvalue reference.**
+
+Why reference to reference is not allowed? We can think of it as reference is a nickname to an object, so a reference to reference would be a nickname for nickname which is redundant, because since we are mentioning the same object, we should use it as the nickname to that object directly. But the weird part is in C++, we have different kinds of nicknames, which is lvalue reference and rvalue reference, so we should make that clear, and that is why we need reference collapsing.
+
+Things to Remember
+
+- Reference collapsing occurs in four contexts: template instantiation, auto type generation, creation and use of `typedef`s and alias declarations, and `decltype`.
+- When compilers generate a reference to a reference in a reference collapsing context, the result becomes a single reference. If either of the original references is an lvalue reference, the result is an lvalue reference. Otherwise it's an rvalue reference.
+- Universal references are rvalue references in contexts where type deduction distinguishes lvalues from rvalues and where reference collapsing occurs.
+
+## Item 29: Assume that move operations are not present, not cheap, and not used.
+
+Though we invented `move` to enable cheap resource ownership exchange, but not all data types can be simply moved without copy, like `std::vector` can just pass the pointer and set the original one to `nullptr`, but objects like `std::array` will do per-element move. This difference is because `std::vector` is allocated on heap which is dynamic but `std::array` is on stack and static.
+
+Things to Remember
+
+- Assume that move operations are not present, not cheap, and not used.
+- In code with known types or support for move semantics, there is no need for assumptions.
