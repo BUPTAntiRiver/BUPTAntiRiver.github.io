@@ -353,3 +353,77 @@ Things to Remember
 - In code with known types or support for move semantics, there is no need for assumptions.
 
 ## Item 30: Familiarize yourself with perfect forwarding failure cases.
+
+Perfect forwarding still has some edge cases that will fail, we should check them out. Before embarking our epsilon cases exploration, it's worthwhile to review _what's meant by "perfect forwarding."_ "Forwarding" just means that one function passes-_forwards_-its parameters to another function. The goal is for the second function to receive the _same_ objects that the first function received.
+
+We rule out (exclude) by-value parameters, because they are exact _copies_ of what the original caller passed in. Also pointer values are ruled out because force callers to pass pointers is not good design, we don't want to do that.
+
+So when it comes to general-purpose forwarding, we'll be dealing with parameters that are references.
+
+Usually we will write code like:
+
+```cpp
+template<typename... Ts>
+void fwd(Ts&&... params)            // accept any arguments
+{
+	f(std::forward<Ts>(params)...); // forward them to f
+}
+```
+
+Given our target function `f` and our forwarding function `fwd`, perfect forwarding _fails_ if calling `f` with a particular argument does different thing when calling `fwd` with the same argument:
+
+```cpp
+f(expression);
+fwd(expression);
+```
+
+Several kinds of arguments lead to this kind of failure.
+
+### Braced Initializers
+
+As we always know initializers are tricky. Suppose `f` is declared as:
+
+```cpp
+void f(const std::vector<int>& v);
+```
+
+In that case, calling `f` with a braced initializer compiles but fails when passing to `fwd` because the use of a braced initializer is a _perfect forwarding failure_ case. Perfect forwarding fails when either of the following occurs:
+
+- **Compilers are unable to deduce a type** for one or more of `fwd`'s parameters.
+- **Compilers deduce the "wrong" type** for one or more of `fwd`'s parameters. The "wrong" here can be compile failure or causing to call different overloads of `f`.
+
+In [[#Item 2 Understand `auto` type deduction.]] we see that `auto` can succeed the type deduction, so code like:
+
+```cpp
+auto il = {1, 2, 3};
+fwd(il);
+```
+
+will work.
+
+### `0` or `NULL` as null pointers
+
+In [[#Item 8 Prefer `nullptr` to `0` and `NULL`.]] we know that they act differently because they are deduced as an integral type (typically `int`) instead of a pointer type for the argument we pass.
+
+### Declaration-only integral `static const` data members
+
+As a general rule, there's no need to define integral `static const` data members in classes; declarations alone are suffice. That's because compile does _const propagation_ on such members' values (thanks compiler). But if we do this there might be problem.
+
+### Overloaded function names and template names
+
+For perfect forward deduction, it won't know which one of the _many_ overloads should be passed.
+
+We should declare the function type of the passed function, can be done with `static_cast` or declaration.
+
+### Bitfields
+
+References will point to stuff, but in C++, you are not allowed to point to arbitrary bits (the smallest thing you can point to is a `char`), like a bit field, which might be bits 3-5 of a 32-bit `int`. And for `fwd` it will use such reference and fail.
+
+You may cast that field to corresponding length types and then run the `fwd`.
+
+### Summary
+
+Things to Remember
+
+- Perfect forwarding fails when template type deduction fails or when it deduces the wrong type.
+- The kinds of arguments that lead to perfect forwarding failure are braced initializers, null pointers expressed as `0` or `NULL`, declaration-only integral `const` static data members, template and overloaded function names, and bitfields.
