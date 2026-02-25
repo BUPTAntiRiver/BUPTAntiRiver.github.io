@@ -427,3 +427,134 @@ Things to Remember
 
 - Perfect forwarding fails when template type deduction fails or when it deduces the wrong type.
 - The kinds of arguments that lead to perfect forwarding failure are braced initializers, null pointers expressed as `0` or `NULL`, declaration-only integral `const` static data members, template and overloaded function names, and bitfields.
+
+# Chapter 6 Lambda Expressions
+
+A _lambda expression_ is a expression and looks like this:
+
+```cpp
+[](int val) { return 0 < val && val < 10;}
+```
+
+A _closure_ is the runtime object created by a lambda, depending on the capture mode, closures hold copies of or references to the captured data (putting them in the `[]`).
+
+## Item 31: Avoid default capture modes.
+
+There are two default capture modes in C++11: by-reference and by-value. Default by-reference capture can lead to dangling references, by-value capture can also have such problem and the closure might not be self-contained.
+
+A _by-reference_ capture `[&]` causes a closure to contain a reference to a _local_ variable or to a parameter that's _available in the scope where the lambda is defined_. So if the lifetime of lambda exceeds the captured data, the reference in the closure will **dangle**.
+
+One way to solve such problem would be a default by-value capture mode `[=]`, but in general, default by-value capture isn't the anti-dangling elixir you might imagine. Because if we pass pointers, it can still dangle!
+
+But wait! That though is anti-modern C++! We should only use smart pointers.
+
+However, we still might use raw pointers, and captures only apply to non-`static` local variables, so for private class members, if we pass it, the code won't compile. Since then, in order to pass the private members, we have to pass `this` pointer.
+
+You may already think of that we can copy the private data member and then capture it, and you are correct! It works.
+
+Things to Remember
+
+- Default by-reference capture can lead to dangling references.
+- Default by-value capture is susceptible to dangling pointers (especially this), and it misleadingly suggests that lambdas are self-contained.
+
+## Item 32: Use init capture to move objects into closures.
+
+Things to Remember
+
+- Use C++14's init capture to move objects into closures.
+- In C++11, emulate init capture via hand-written classes or `std::bind`.
+
+## Item 33: Use `decltype` on `auto&&` parameters to `std::forward` them.
+
+The essence of lambda is that compiler will create a closure class that provides a function call operator, so when dealing with forwarding function calls in lambda, we should treat them like previously mentioned.
+
+Things to Remember
+
+- Use `decltype` on `auto&&` parameters to `std::forward` them.
+
+## Item 34: Prefer lambdas to `std::bind`.
+
+Things to Remember
+
+- Lambdas are more readable, more expressive, and may be more efficient than using `std::bind`.
+- In C++11 only, `std::bind` may be useful for implementing move capture or for binding objects with templatized function call operators.
+
+# Chapter 7 The Concurrency API
+
+## Item 35: Prefer task-based programming to thread-based.
+
+For example we want to run a function `doAsyncWork` asynchronously, we have two basic choices:
+
+```cpp
+int doAsyncWork();
+std::thread t(doAsyncWork); // thread-based
+auto fut = std::async(doAsyncWork); // task-based
+```
+
+If `doAsyncWork` has some return value, that invoking code is probably interested in, then we can access it easily with task-based approach, because `fut` will have a `get` function, but thread-based approach will be a bit more complicated. Also task-based approach can get exceptions, while in thread-based case, it will died.
+
+Things to Remember
+
+- The `std::thread` API offers no direct way to get return values from asynchrnously run functions, and if those functions throw, the program is terminated.
+- Thread-based programming calls for manual management of thread exhaustion, oversubscription, load balancing, and adaptation to new platforms.
+- Task-based programming via `std::async` with the default launch policy handles most of these issues for you.
+
+## Item 36: Specify `std::launch::async` if asynchronicity is essential.
+
+Things to Remember
+
+- The default launch policy for `std::async` permits both asynchronous and synchronous task execution.
+- This flexibility leads to uncertainty when accessing thread_locals, implies that the task may never execute, and affects program logic for timeout-based wait calls.
+- Specify `std::launch::async` if asynchronous task execution is essential.
+
+## Item 37: Make `std::threads` unjoinable on all paths.
+
+Things to Remember
+
+- Make `std::threads` unjoinable on all paths.
+- join-on-destruction can lead to difficult-to-debug performance anomalies.
+- detach-on-destruction can lead to difficult-to-debug undefined behavior.
+- Declare `std::thread` objects last in lists of data members.
+
+## Item 38: Be aware of varying thread handle destructor behavior.
+
+Things to Remember
+
+- Future destructors normally just destroy the future's data members.
+- The final future referring to a shared state for a non-deferred task launched via `std::async` blocks until the task completes.
+
+## Item 39: Consider `void` futures for one-shot event communication.
+
+Things to Remember
+
+- For simple event communication, condvar-based designs require a superfluous mutex, impose constraints on the relative progress of detecting and reacting tasks, and require reacting tasks to verify that the event has taken place.
+- Designs employing a flag avoid those problems, but are based on polling, not blocking.
+- A condvar and flag can be used together, but the resulting communications mechanism is somewhat stilted.
+- Using `std::promise`s and futures dodges these issues, but the approach uses heap memory for shared states, and it's limited to one-shot communication.
+
+## Item 40: Use `std::atomic` for concurrency, `volatile` for special memory.
+
+Things to Remember
+
+- `std::atomic` is for data accessed from multiple threads without using mutexes. It's a tool for writing concurrent software.
+- volatile is for memory where reads and writes should not be optimized away. It's a tool for working with special memory.
+
+# Chapter 8 Tweaks
+
+In this part we talk about some circumstances that will be reasonable to use the design techniques.
+
+## Item 41: Consider pass by value for copyable parameters that are cheap to move and always copied.
+
+Things to Remember
+
+- For copyable, cheap-to-move parameters that are always copied, pass by value may be nearly as efficient as pass by reference, it's easier to implement, and it can generate less object code.
+- Copying parameters via construction may be significantly more expensive than copying them via assignment.
+- Pass by value is subject to the slicing problem, so it's typically inappropriate for base class parameter types.
+
+## Item 42: Consider emplacement instead of insertion.
+
+Things to Remember
+
+- In principle, emplacement functions should sometimes be more efficient than their insertion counterparts, and they should never be less efficient.
+- In practice, they're most likely to be faster when (1) the value being added is constructed into the container, not assigned; (2) the argument type(s) passed differ from the type held by the container; and (3) the container won't reject the value being added due to it being a duplicate.
+- Emplacement functions may perform type conversions that would be rejected by insertion functions.
