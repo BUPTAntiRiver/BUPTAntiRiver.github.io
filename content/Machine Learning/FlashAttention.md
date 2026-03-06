@@ -17,7 +17,9 @@ Suppose sequence length $n$ and hidden size $d$, then $QK^T$ would be of size $n
 ## Introduction
 
 GPU has **three memory hierarchy**, from highest bandwidth to lowest are: GPU SRAM (20 MB), GPU HBM (40 GB) and MAIN MEMORY (>1 TB). This is the **IO cost** we should consider in real scene, which is the **bottleneck** of most operations in Transformer.
+
 We want to keep data in SRAM to achieve higher average bandwidth, but SRAM also has smallest size, so it won't be possible to store the whole K, V matrix in it. Instead, we choose to loop through blocks of **K**, **V** matrices.
+
 Flash attention enables **faster training** and **higher quality models (longer sequence length to hold, faster is better!)**.
 
 ## Background
@@ -112,12 +114,12 @@ This part is more straight forward in the paper. Comparing to the original paper
 
 This method is specially optimized for Hopper architecture GPUs by NVIDIA. In this paper, the researchers used NVIDIA Hopper H100 SXM5 GPU as benchmark, its Thread-Memory Hierarchy looks like this:
 
-| Hardware Level     | Parallel Agent                              | Data Locale     |     |
-| ------------------ | ------------------------------------------- | --------------- | --- |
-| Chip               | Grid                                        | GMEM            |     |
-| GPC                | Threadblock Clusters                        | L2              |     |
-| SM (Shared Memory) | Threadblock (CTA cooperative thread arrays) | SMEM            |     |
-| Thread             | Thread                                      | RMEM (Register) |     |
+| Hardware Level     | Parallel Agent                              | Data Locale     |
+| ------------------ | ------------------------------------------- | --------------- |
+| Chip               | Grid                                        | GMEM            |
+| GPC                | Threadblock Clusters                        | L2              |
+| SM (Shared Memory) | Threadblock (CTA cooperative thread arrays) | SMEM            |
+| Thread             | Thread                                      | RMEM (Register) |
 
 From top to bottom the capacity grows smaller but bandwidth becomes higher.
 
@@ -144,6 +146,7 @@ Compiler reordering, high register pressure, and 3 or more stage pipelining whic
 #### Efficiency
 
 The $Q,K,V$ are typically given as contiguous in the head dimension, while to satisfy the k-major constraint, we need $V$ to be contiguous in the sequence length dimension. So we should either (1) transpose $V$ in GMEM as a pre-processing step, or (2) do an in-kernel transpose of tiles of $V$ after loading them into SMEM. We choose (2) here, the reason is in the paper.
+
 There is another problem, the layout of FP8 and FP32 are very different, so we must transform the layout before loading the data into operand A register.
 
 #### Accuracy

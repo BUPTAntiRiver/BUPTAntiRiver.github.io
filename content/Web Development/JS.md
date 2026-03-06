@@ -1,1 +1,0 @@
-Define the behaviors of web page.
