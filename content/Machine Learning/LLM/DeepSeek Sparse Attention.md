@@ -1,4 +1,4 @@
-Resource: [Paper](http://arxiv.org/abs/2512.02556)
+Paper link: [Paper](http://arxiv.org/abs/2512.02556)
 
 **Prototype of DSA.** DSA has two components: a lightning indexer and a fine-grained token selection mechanism.
 
