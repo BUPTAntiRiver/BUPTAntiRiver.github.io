@@ -1,6 +1,6 @@
 Paper Link: http://arxiv.org/abs/2602.21548
 
-**The Problem** they try to solve in this paper is that _the performance of multi-turn, agentic LLM is increasingly dominated by KV-cache storage IO_ rather than computation. Classic IO bound problem in modern development.
+**The Problem** they try to solve in this paper is that _the performance of multi-turn, agentic LLM is increasingly dominated by [[KV Cache|KV-cache]] storage IO_ rather than computation. Classic IO bound problem in modern development.
 
 In prevalent dis-aggregated architectures, we have a prefill engine and a decode engine, therefore loading the massive KV-cache from external storage creates a **imbalance**: storage NICs (network interface card) on prefill engines become _bandwidth-saturated_, while those on decoding engines remain _idle_.
 

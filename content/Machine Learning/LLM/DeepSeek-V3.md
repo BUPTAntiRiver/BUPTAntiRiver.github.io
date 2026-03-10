@@ -14,7 +14,7 @@ The basic architecture is still within the Transformer framework. But they use M
 
 ### Multi-Head Latent Attention
 
-The core of MLA is the low-rank joint compression for attention keys and values to **reduce Key-Value (KV) cache during inference**. They first **down project the input to a lower dimension intermediate vector to cache**, and then up project it back to context length by head number size to calculate, which reduces the amount of data need to cache during generation.
+The core of MLA is the low-rank joint compression for attention keys and values to **reduce [[KV Cache|Key-Value (KV) cache]] during inference**. They first **down project the input to a lower dimension intermediate vector to cache**, and then up project it back to context length by head number size to calculate, which reduces the amount of data need to cache during generation.
 
 ### DeepSeekMoE with Auxiliary-Loss-Free Load Balancing
 

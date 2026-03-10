@@ -71,7 +71,7 @@ There is no non-linear activation so far, then we use FFN to bring this function
 
 ### KV Cache Optimization
 
-During Transformer decoding, we need to store the **Keys** and **Values** of all previous tokens so that we can perform the attention computation, namely the KV cache, but the KV cache can be very large for with long context. But we only need the **current** query token.
+During Transformer decoding, we need to store the **Keys** and **Values** of all previous tokens so that we can perform the attention computation, namely the [[KV Cache]], but the KV cache can be very large for with long context. However we only need the **current** query token.
 
 We can reduce the KV cache by reducing \#KV-heads.
 

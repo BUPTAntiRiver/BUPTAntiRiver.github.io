@@ -1,6 +1,7 @@
 # What is KTransformers
 
-KTransformers is a Python-centric software framework designed for optimizing inference of large language models (LLMs) and transformer architectures. It’s developed under the GitHub project “kvcache-ai/ktransformers”. [GitHub](https://github.com/kvcache-ai/ktransformers?utm_source=chatgpt.com)  
+KTransformers is a Python-centric software framework designed for optimizing inference of large language models (LLMs) and transformer architectures. It’s developed under the GitHub project “kvcache-ai/ktransformers”. [GitHub](https://github.com/kvcache-ai/ktransformers?utm_source=chatgpt.com)
+
 Key features:
 
 - It lets you inject optimized modules (kernels) into existing transformer models (e.g., replacing standard linear layers or attention modules) via a template/“injection” mechanism. [GitHub](https://github.com/kvcache-ai/ktransformers?utm_source=chatgpt.com)
