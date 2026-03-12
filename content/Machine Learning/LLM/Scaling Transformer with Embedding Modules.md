@@ -75,6 +75,14 @@ So why STEM choose to replace up projection with token id embedding but not othe
 
 Since each token has their own embedding, if we change the embedding value of specific id, it can perform very differently. If we replace America with France embedding, then ask questions like what is the capital of America, the model will answer Paris. The details about how to deal with token count mismatch are in the paper.
 
+### System Implementation
+
+Naive implementation of STEM can introduce system challenges. The STEM embedding table size grows linearly with vocab size, FFN intermediate dimension, and number of STEM layers. The key optimizations include _parallel embeddings, CPU offloading, asynchronous computation and communication, token deduplication, and LFU caching_.
+
+During inference, we offload the large STEM embedding tables to CPU. Because the STEM embeddings are indexed by input token ids, so they can be prefetched asynchronously. Since input token follows a Zipfian distribution, we can use a memory efficient LFU cache to increase hit rate.
+
+The distributed training strategy is put a full STEM table on each node, shall be introduced more concretely in future works.s
+
 # Third Pass
 
-TODO: reimplement STEM, test performance and try knowledge edit.
+Note that, STEM is not conflict with MoE, because STEM is a FFN replacement method, and MoE is actually a lot of FFNs, they are orthogonal approaches to scale up model paramters. So each FFN in MoE can also be STEM, then we get a _Mixture of STEM Experts_.
