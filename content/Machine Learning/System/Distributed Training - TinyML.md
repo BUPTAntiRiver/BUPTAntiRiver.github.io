@@ -49,7 +49,7 @@ Even the best GPU cannot fit the model weights of current large language models,
 
 ## Pipeline Parallelism
 
-Single copy of data, but split the model across the GPU.
+Single copy of data, but split the model across the GPU, also called as inter-op parallel.
 
 We can imagine the naive implementation be like, we have 4 GPU, and they run forward 1 to 4 sequentially, then backward 4 to 1 sequentially, this works but will have huge amount of idle time, the utilization will be very low.
 
@@ -57,7 +57,8 @@ How to improve? We can separate the batch into micro batches: $[16,10,512]\to 4*
 
 ## Tensor Parallelism
 
-Single copy of data, split the activations then synchronize.
+Single copy of data, split the activations then synchronize, also called as intra-op parallel.
+
 Even with optimization, PP still has a lot of idle time, we can keep improving this by making the model partition **more fine-grained**. Which leads to Tensor Parallelism, split a weight tensor into $N$ chunks and paralleled.
 
 ## Sequence Parallelism
