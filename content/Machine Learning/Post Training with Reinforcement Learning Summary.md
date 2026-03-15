@@ -1,4 +1,5 @@
 Before talking about the methods, we must understand why we keep working on such topic. The answer is, we want better **performance**, faster **speed** and **stability** or **reliability**.
+
 Post training comes from the work of large language model's alignment and safety work. It is usually applied after supervised fine-tuning.
 
 # PPO
@@ -24,13 +25,13 @@ $$
 
 we can transform the object with something like Lagrangian dual into a unconstrained problem.
 
-However solving for the divergence constraint is pretty hard and takes more computation time, so why do we need to constraint? It is designed to ensure the update of policy is not too big. We can imagine if there is no constraint and for a timestamp the advantage $A$ is very big, the policy will try it's best to maximize that action, especially when the old probability is pretty low. And then the training will be very unstable, so we need to divergence. And that is why PPO is very clever.
+However solving for the divergence constraint is pretty hard and takes more computation time, so why do we need this constraint? It is designed to ensure the update of policy is not too big. We can imagine if there is no constraint, and for a timestamp the advantage $A$ is very big, the policy will try it's best to maximize that action, especially when the old probability is pretty low. And then the training will be very unstable, so we need the divergence. And that is why PPO is very clever.
 
-Since our main purpose is to **reduce shift in objective**, PPO propose they will just clip objective directly. By doing so, they don't need to solve for the divergence which means faster speed, easier to implement and can still achieve a pretty good performance, stability and reliability.
+Since our main purpose is to **_reduce shift in objective_**, PPO propose they will **_just clip objective directly_**. By doing so, they don't need to solve for the divergence which means faster speed, easier to implement and can still achieve a pretty good performance, stability and reliability.
 
 # DPO
 
-The full name of DPO is Direct Preference Optimization, which is proposed for Reinforcement Learning Human Feedback. It is usually trained with human-annotated preference data $(q,o_{+},o_{-})\sim\mathcal{D}_{\text{DPO}}$. The loss function is:
+The full name of DPO is Direct Preference Optimization, which is proposed for Reinforcement Learning Human Feedback (RLHF). It is usually trained with human-annotated preference data $(q,o_{+},o_{-})\sim\mathcal{D}_{\text{DPO}}$. The loss function is:
 
 $$
 \mathcal{L}_{\text{DPO}} = -\mathbb{E}_{(q, o_+, o_-) \sim \mathcal{D}_{\text{DPO}}} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(o_+|q)}{\pi_{\text{ref}}(o_+|q)} - \beta \log \frac{\pi_\theta(o_-|q)}{\pi_{\text{ref}}(o_-|q)} \right) \right]
@@ -40,7 +41,7 @@ Since it is trained with human-annotated data, it is also considered as a superv
 
 # GRPO
 
-Full name: Group Relative Policy Optimization. It is used in DeepSeek-R1 and achieved great success. Instead of maintaining a value network (which is used to calculate $A$, the advantage) like PPO, GRPO generates a group of $G$ trajectories for each prompt and normalizes the corresponding rewards within each group to compute the advantages:
+Full name: Group Relative Policy Optimization. It is used in [[DeepSeek-R1]] and achieved great success. Instead of maintaining a value network (which is used to calculate $A$, the advantage) like PPO, GRPO generates a group of $G$ trajectories for each prompt and normalizes the corresponding rewards within each group to compute the advantages:
 
 $$
 \mathcal{J}_{\text{GRPO}}(\theta) = \underset{\substack{q \sim \mathcal{Q} \\ o_i \sim \pi_{\theta_{\text{old}}}}}{\mathbb{E}} \, \frac{1}{G} \sum_{i=1}^G \frac{1}{|o_i|} \sum_{t=1}^{|o_i|} \min\left[ \frac{\pi_\theta(o_{i,t} | o_{i,<t}, q)}{\pi_{\theta_{\text{old}}}(o_{i,t} | o_{i,<t}, q)} A_{i,t}, \, \text{clip}\left( \frac{\pi_\theta(o_{i,t} | o_{i,<t}, q)}{\pi_{\theta_{\text{old}}}(o_{i,t} | o_{i,<t}, q)}, 1-\epsilon, 1+\epsilon \right) A_{i,t} \right]
@@ -58,7 +59,7 @@ So we reduce the cost of a value model, only use reward model to calculate the a
 
 ### Breaking baseline rule
 
-GRPO calculates advantage by subtracting mean of rewards and dividing it with standard deviation, but the baseline rule of reinforcement learning says that what we can do is to subtract any _state-dependent only_ term from out rewards. So this breaks such rule, and the key problem is dividing by standard deviation. With low deviation we will have much greater reward, so model will learn more from it. And usually very easy (all correct) and very hard (all wrong) questions can achieve low deviation, such design of advantage leads to **bias towards super easy and hard questions.**
+GRPO calculates advantage by subtracting mean of rewards and dividing it with standard deviation, but the baseline rule of reinforcement learning says that, what we can do is to subtract any _state-dependent only_ term from out rewards. So this breaks such rule, and the key problem is dividing by standard deviation. With low deviation we will have much greater reward, so model will learn more from it. And usually very easy (all correct) and very hard (all wrong) questions can achieve low deviation, such design of advantage leads to **bias towards super easy and hard questions.**
 
 ### Length bias
 
