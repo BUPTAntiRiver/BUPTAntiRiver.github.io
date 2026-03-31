@@ -65,6 +65,36 @@ GRPO calculates advantage by subtracting mean of rewards and dividing it with st
 
 GRPO takes output length $|o_{i}|$ into consideration, which means when we have negative rewards, the model will try to make the answer as long as possible, in contrast when rewards are positive, the model will try to make short answers. That is probably why we see really long chain of thoughts in DeepSeek's GRPO trained model, this is not proven but a quite interesting point of view.
 
+# DAPO
+
+## Higher Clip
+
+Decoupled clip and Dynamic sAmpling Policy Optimization. Kind of like a improved version of GRPO. It replaces the clip method with **higher-clip**, which means we have a clip range $(1-\varepsilon_{\text{low}},1+\varepsilon_{\text{high}})$, and $\varepsilon_{\text{high}}$ has bigger value, so that even actions with small probability can have more tolerance, which enhance exploration.
+
+## Dynamic Sampling
+
+In RL, there might be cases the question is too easy or hard, so we have 0 or 1 accuracy, in this case, if we use GRPO, we might ran into a wrong way that only tries to maximize answer length or minimize it but not learning anything. From the perspective of Information Theory, this also makes sense, the more can be predicted, the less to learn.
+
+So DAPO has a constraint, $0<|\{o_{i}\mid\text{is\_equivalent}(o_{i},a)\}|<G$, where $o_{i}$ is sampled output, $a$ is ground truth answer, and $G$ is current group count.
+
+## Token-level Gradient Loss
+
+The original GRPO algorithm employs a sample-level loss calculation, which involves first averaging the losses by token within each sample and then aggregating the losses across samples. In this approach, each sample is assigned an equal weight in the final loss computation. This leads to the problem: **length bias** we mentioned before, the bad patterns are not punished enough due to long sequence length's protection.
+
+So DAPO provides a **Token-Level Policy Gradient Loss** to address such issue:
+
+$$
+\begin{align*}
+\mathcal{J}_{\text{DAPO}}(\theta) =& \mathbb{E}_{(q, a) \sim \mathcal{D}, \{o_i\}_{i=1}^G \sim \pi_{\theta_{\text{old}}}(\cdot | q)} \\
+&\left[ \frac{1}{\sum_{i=1}^G |o_i|} \sum_{i=1}^G \sum_{t=1}^{|o_i|} \min \left( r_{i,t}(\theta)\hat{A}_{i,t}, \, \text{clip}\left( r_{i,t}(\theta), 1 - \varepsilon_{\text{low}}, 1 + \varepsilon_{\text{high}} \right) \hat{A}_{i,t} \right) \right], \\
+\text{s.t.}& \quad 0 < \left| \{ o_i \mid \text{is\_equivalent}(a, o_i) \} \right| < G.
+\end{align*}
+$$
+
+Everybody are together now, the bad answer in long sequence may not be that influential inside its sequence, but due to your long length, you still share more influence on shorter samples. Moreover, from the perspective of individual tokens, if a particular generation pattern can lead to an increase or decrease in reward, it will be equally prompted or suppressed, regardless of the length of the response in which it appears.
+
+But this solution is still not perfect, single token's effort is still distributed and not that much connected as a "sequence". This leads to the following method.
+
 # GSPO
 
 ## Motivation
