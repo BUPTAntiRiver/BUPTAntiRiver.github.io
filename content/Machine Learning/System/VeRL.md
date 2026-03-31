@@ -8,5 +8,4 @@ Such graph, or we can say dataflow model is the core system level idea of VeRL.
 
 # Why?
 
-
 # How?
