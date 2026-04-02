@@ -31,6 +31,7 @@ g(x_m, x_n, m-n) &= \mathrm{Re}\!\left[(W_q x_m)(W_k x_n)^{*} e^{i(m-n)\theta}\r
 $$
 
 The inspiration comes from 2-dimension vector relation.
+
 If we push the case to $n$ dimension, we will get:
 
 $$
