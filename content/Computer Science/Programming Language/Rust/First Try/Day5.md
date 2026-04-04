@@ -29,3 +29,21 @@ fn main() {
     );
 }
 ```
+
+Also we can have some methods that acts like a constructor, which returns corresponding object:
+
+```rust
+impl Rectangle {
+	fn square(size: u32) -> Self {
+		Self {
+			width: size,
+			height: size,
+		}
+	}
+}
+
+// access with namespace style syntax
+let sq = Rectangle::square(3);
+```
+
+Also can have methods takes more than one arguments.
