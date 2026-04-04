@@ -1,3 +1,5 @@
+Paper link: http://arxiv.org/abs/2501.12948
+
 This paper mainly focuses on lots of engineering ingenuity rather than proposing a very new algorithm. Two reasoning models are introduced in this paper: DeepSeek-R1-Zero and DeepSeek-R1. DeepSeek-R1-Zero is a model trained via **large scale reinforcement learning (RL) without supervised fine-tuning (SFT)** as a preliminary step. And DeepSeek-R1 incorporates **multi-stage training** and **cold-start data** before RL.
 
 # Introduction

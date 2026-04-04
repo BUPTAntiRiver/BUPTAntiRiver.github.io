@@ -44,7 +44,7 @@ $$
 - _Communication overhead._ We have more fragment peer to peer exchange, and communication becomes more _latency-dominated_ due to many small payloads and overhead but not bandwidth bottleneck.
 - _Unbalanced expert frequency._ Word frequencies are [Zipfian](https://en.wikipedia.org/wiki/Zipf%27s_law), so only a few high-frequency experts receive disproportionate traffic while a long tail is rarely activated.
 
-**Per Layer Embedding.** Unlike MoWE, the Per Layer Embedding (PLE) _share_ the gate projection and down projection of the FFN block across expert subnetworks. However they didn't completely dispense the existing FFN in each decoder layer. Instead they append an additional PLE block to FFN. And the token-level specific mapping tables are not shared across multiple devices, but _stored on node-local CPU memory_. So they can be prefetched as required, thus avoid high all-to-all communication traffic. Sharing the gate and down projection also alleviates negative effects of frequency imbalance.
+**Per Layer Embedding.** Unlike MoWE, the Per Layer Embedding (PLE) _share_ the gate projection and down projection of the FFN block across expert sub-networks. However they didn't completely dispense the existing FFN in each decoder layer. Instead they append an additional PLE block to FFN. And the token-level specific mapping tables are not shared across multiple devices, but _stored on node-local CPU memory_. So they can be pre-fetched as required, thus avoid high all-to-all communication traffic. Sharing the gate and down projection also alleviates negative effects of frequency imbalance.
 
 ## Method
 

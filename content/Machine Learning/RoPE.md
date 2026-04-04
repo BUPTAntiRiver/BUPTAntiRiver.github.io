@@ -58,3 +58,21 @@ The big matrix above is of shape $d\times d$ and the $m$ in it is the position o
 Base on their evaluation, RoPE also can show the decay of $S$ with the relative distance $m-n$ increases by setting $\theta_{i}=10000^{-2i/d}$.
 
 If you really do the matrix multiplication you will get something looks like sine and cosine of $\theta_{i}-\theta_{j}$, which is exactly how we measure rotation of vectors.
+
+# Proportional RoPE
+
+The model context length is becoming larger and larger, we have context length like 128 k, so the $m$ in the example above will be more than 10000, which means we might use up the whole round of rotation. In this case we need proportional RoPE that scales down the constant in $\theta$ to ensure a valid rotation transformation. Usually we do something like dividing with $L$ (context length) to compress the rotation range.
+
+Imagine the original RoPE transformation angle according to position $p$ is:
+
+$$
+\theta_{p}=p\cdot \omega
+$$
+
+Now it becomes:
+
+$$
+\theta_{p}=f(p)\cdot \omega=\frac{p}{L}\cdot \omega
+$$
+
+There are other scaling methods too, like linear scaling, logarithmic scaling or adaptive scaling. I will check this topic in more detail in the future.
