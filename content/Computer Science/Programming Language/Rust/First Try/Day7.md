@@ -115,3 +115,5 @@ fn describe_state_quarter(coin: Coin) -> Option<String> {
     }
 }
 ```
+
+If we have a situation that is too verbose to express using a `match`, remember that `if let` and `let...else` are in our toolbox.
