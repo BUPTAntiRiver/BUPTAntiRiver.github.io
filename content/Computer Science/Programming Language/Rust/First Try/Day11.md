@@ -110,3 +110,15 @@ where
 ```
 
 It will look like this. For further more complex case study, read [Rust Reference](https://doc.rust-lang.org/reference/trait-bounds.html). But I think if you really meet such complex scenario, it might be someone has not that satisfying coding ability and we should try to improve it.
+
+# Test in Rust
+
+We can write our test code and run test with `cargo test`. About the syntax, I think just check the website is a good choice.
+
+Actually it works very similar to `pytest` if you are familiar, or we can say all test tools are approximate to each other? I mean, what garish stuff can appear in a test system? What we want is only correctness!
+
+There are two kinds of tests, _unit tests and integration tests_. Unit tests can be in the same file as source code, so they are decorated with `#[cfg(test)]` and integration tests don't need this, because they are kept in separate folder and files.
+
+# IO project
+
+Finally we have another hands on project to work with! Hooray! Let's enjoy the coding time.
