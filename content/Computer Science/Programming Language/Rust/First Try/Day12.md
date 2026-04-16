@@ -1,4 +1,4 @@
-Today we learned about `Iterator`, Closure, which is different from functions.
+Today we learned about `Iterator` and Closure, which is different from functions.
 
 Also we learned about how to use Cargo in other ways like workspace, in which we can manage multiple library crates.
 
