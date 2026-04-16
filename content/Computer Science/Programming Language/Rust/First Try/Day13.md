@@ -42,3 +42,9 @@ The ultimate nightmare in programming. Let's see how to handle it with Rust.
 Actually this part is very straight forward in the book. Just go to.
 
 `Rc<T>` mentioned earlier is not safe across threads. We will need `Arc<T>` which is the atomic version.
+
+# Asynchronous
+
+Also a huge topic, this chapter introduces how Rust deal with Async programming.
+
+Just like thread uses `spawn`, we can create new async task with `trpl::spawn_task`.
