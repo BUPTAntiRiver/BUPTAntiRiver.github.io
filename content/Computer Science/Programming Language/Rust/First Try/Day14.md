@@ -11,3 +11,7 @@ Actually the idea of inheritance is that the child class can be used at the same
 However inheritance usually shares more code than necessary which can make the program design less flexible, so Rust has some trade-off, we don't use common inheritance but the trait system.
 
 So how do we work with a scenario like we have many components on screen like buttons, select boxes and so on. They all have a `draw` methods to print them on the screen. In inheritance programming languages, we can just define `Draw` class and other classes respectively. With trait, we first define a trait and `impl` corresponding methods `for` these different `struct`s.
+
+---
+
+Also found a experimental version of Rust "the book": https://rust-book.cs.brown.edu/.
