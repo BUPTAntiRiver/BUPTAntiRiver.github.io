@@ -56,3 +56,17 @@ Currently, we have compressed the sequence length to $\frac{1}{m}$ times.
 **Grouped Output Projection.** The output of core attention will have size $\mathbf{o}_{t}\in \mathbb{R}^{cn_{h}}$ where $c$ is head dimension and $n_{h}$ is head number. And we will need to project it to $d$ dimension hidden state, if we do it naively, it will impose a substantial computational burden. To mitigate this cost, they designed a grouped output projection strategy. First split $n_{h}$ outputs into $g$ groups and for each group project them to $d_{g}$ and finally concatenate them back to $d$.
 
 ### 2.3.2. Heavily Compressed Attention
+
+The core architecture is illustrated in the following picture, which compresses the KV cache in a heavier manner, but does not employ sparse attention.
+
+![[Pasted image 20260425203904.png]]
+
+**Compressed Key-Value Entries.** The compression strategy of HCA is similar to that of CSA, but employs a larger compression rate $m'\gg m$ and does not perform overlapped compression. It also does not have a lightning indexer to select top-k entries, because its compress ratio is much higher and can just consume all compressed entries.
+
+It can be boring to write all formulas again, since it is very similar to CSA. Just check out the paper.
+
+### 2.3.3. Other Details
+
+**Query and Key-Value Entry Normalization.** For both CSA and HCA, we perform an additional RMSNorm operation on each head of the queries and the only head of the compressed KV entries, just before the core attention operation.
+
+**Partial Rotary Positional Embedding.** For both CSA and HCA, we partially employ the [[RoPE]] to the attention queries, KV entries and the final core attention outputs, to be specific, we apply RoPE to each query vector and KV entry vector's last 64 dimension. Since KV entries serve as both attention keys and values, the naive core attention outputs will carry absolute position embeddings, derived from the weighted sum of KV entries. As a countermeasure, we also apply RoPE with position $-i$ on the last 64 dimensions of each $o_{t,i}$.
