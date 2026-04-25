@@ -1,9 +1,11 @@
 http://arxiv.org/abs/2401.06066
+
 Conventional MoE architectures like GShard, which activate the top=$K$ out of $N$ experts, face challenges in ensuring expert specialization, which means each expert acquires non-overlapping and focused knowledge. In DeepSeekMoE, they finely segment the experts and isolates $K_{s}$ experts as shared ones, which aiming at capturing common knowledge and mitigating redundancy in routed experts.
 
 # Introduction
 
 Recent research and practices show that with sufficient training data available, **scaling** language models with increased parameters and computation budgets can yield remarkably stronger models. MoE comes as a solution to enable parameter scaling while keeping computational cost at a modest level.
+
 Conventional MoE architectures substitute the FFN in a Transformer with MoE layers. Each MoE layer consists of multiple experts, with each structurally identical to a standard FFN, and each token is assigned to one or two experts through gate. This architecture manifests two potential issues:
 
 1. **Knowledge Hybrid**: existing MoE practices often employ a limited number of experts and thus tokens assigned to a specific expert will be likely to cover diverse knowledge but not specific one.
@@ -28,6 +30,7 @@ $$
 $$
 
 Layer normalization is omitted here.
+
 A typical practice to construct an MoE language model usually substitutes FFNs in a Transformer with MoE layers at specified intervals. If the $l$-th FFN is substituted with an MoE layer, the computation of its output hidden state $\mathbf{h}^{l}_{t}$ is expressed as:
 
 $$
@@ -51,6 +54,7 @@ $g_{i,t}$ denotes the gate value for the $i$-th expert, $s_{i,t}$ denotes the to
 ## Fine-Grained Expert Segmentation
 
 They want each token to be routed to more experts, so diverse knowledge will gain the potential to be decomposed and learned in different experts respectively.
+
 They segment each expert FFN into $m$ smaller experts by reducing the FFN intermediate hidden dimension to $\frac{1}{m}$ times its original size. Since each expert becomes smaller, in response they also increase the number of activated experts to $m$ times to keep the same computation cost. The parameters amounts are the same with standard MoE but the potential combinations are greatly increased.
 
 ## Shared Expert Isolation
