@@ -70,3 +70,25 @@ It can be boring to write all formulas again, since it is very similar to CSA. J
 **Query and Key-Value Entry Normalization.** For both CSA and HCA, we perform an additional RMSNorm operation on each head of the queries and the only head of the compressed KV entries, just before the core attention operation.
 
 **Partial Rotary Positional Embedding.** For both CSA and HCA, we partially employ the [[RoPE]] to the attention queries, KV entries and the final core attention outputs, to be specific, we apply RoPE to each query vector and KV entry vector's last 64 dimension. Since KV entries serve as both attention keys and values, the naive core attention outputs will carry absolute position embeddings, derived from the weighted sum of KV entries. As a countermeasure, we also apply RoPE with position $-i$ on the last 64 dimensions of each $o_{t,i}$.
+
+**Additional Branch of Sliding Window Attention.** In order to preserve causality in CSA and HCA, each query attends to only preceding compressed KV blocks. So a query cannot access information from other tokens within its own compressed block. Meanwhile recent tokens are usually more important. For these reasons, we introduce $n_{\text{win}}$ uncompressed KV entries corresponding to the recent $n_{\text{win}}$ tokens. The sliding window KV entries will be used along with the compressed KV entries.
+
+**Attention Sink.** This trick means that in the core attention, we set a series of learnable sink logits $\{z'_{1},\dots ,z'_{n_{h}}\}$. For the $h$-th attention head, $\text{Exp}(z'_{h})$ will be added to the denominator of the attention score, so that the total score may not be 1, and even to be near 0 now. Adds more learning space.
+
+### 2.3.4. Efficiency Discussion
+
+BF16 for RoPE and FP8 for other dimensions, also only FP4 for the lightning indexer. Such mixed lower precision combing with the architecture enables to reduce KV cache size to 2% of BF16 GQA8 attention.
+
+## 2.4. Muon Optimizer
+
+What we need from optimizer is stable and fast convergence, and Muon supports this. For majority of the modules in V4 they applied Muon. Since RMSNorm was applied directly to queries and KV entries, which effectively prevents attention logits from exploding, they do not apply the QK-clip technique used in original Muon. Checkout other details in the paper.
+
+# 3. General Infrastructures
+
+## 3.1. Expert Parallelism Communication Overlap
+
+In V4, each MoE layer can be decomposed into four stages: two communication-bound stages, _Dispatch_ and _Combine_, and two computation-bound stages, _Linear-1_ and _Linear-2_.
+
+The optimization of V4 is shown in the following picture, they managed the dispatch and combine in **_waves_** of experts, so the latency between different waves and be overlapped with each other:
+
+![[Pasted image 20260426153307.png]]
