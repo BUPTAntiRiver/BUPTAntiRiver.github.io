@@ -92,3 +92,10 @@ In V4, each MoE layer can be decomposed into four stages: two communication-boun
 The optimization of V4 is shown in the following picture, they managed the dispatch and combine in **_waves_** of experts, so the latency between different waves and be overlapped with each other:
 
 ![[Pasted image 20260426153307.png]]
+
+Also they wrote their own kernel that optimized for such detailed expert parallelism.
+
+**Observations and Proposals.** The DeepSeek team is so kind and open that they provided what they have learned and concluded from their work:
+
+- **Computation-Communication Ratio.** We want to hide communication time and computation time within each other, and usually communication goes first so we hide communication into computation, and that means if the communication time exceeds computation time, it won't be possible to do such optimization totally, so they encourage the hardware designer to improve hardware ability coordinately on both side so that we can avoid waste of power. But this is very model specific, so it must require deep corporation between model designers and hardware providers. Or the model group in hardware company should pay attention to this.
+- **Activation Function.** Instead of using SwiGLU, they propose using a low-cost element wise activation that involves no exponential or division operations. Removing the gate projection enlarges the intermediate dimension $d$, further relaxing the bandwidth requirement.
