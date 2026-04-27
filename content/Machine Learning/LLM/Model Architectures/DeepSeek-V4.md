@@ -99,3 +99,12 @@ Also they wrote their own kernel that optimized for such detailed expert paralle
 
 - **Computation-Communication Ratio.** We want to hide communication time and computation time within each other, and usually communication goes first so we hide communication into computation, and that means if the communication time exceeds computation time, it won't be possible to do such optimization totally, so they encourage the hardware designer to improve hardware ability coordinately on both side so that we can avoid waste of power. But this is very model specific, so it must require deep corporation between model designers and hardware providers. Or the model group in hardware company should pay attention to this.
 - **Activation Function.** Instead of using SwiGLU, they propose using a low-cost element wise activation that involves no exponential or division operations. Removing the gate projection enlarges the intermediate dimension $d$, further relaxing the bandwidth requirement.
+
+## 3.2. Specific Developments
+
+They use TileLang. And one key point is they pay attention to reproducibility. That matters a lot in study.
+
+They also provide _high-performance batch-invariant and deterministic kernel libraries_. Determinism is very important for debugging hardware and software issues. And non-determinism in training typically stems from non-determinism **accumulation order**, often due to the use of atomic addition instructions. Which primarily occurs during the backward pass, and has three main sources:
+
+- **Attention Backward.** In conventional implementation of backward propagation, we use `atomicAdd` to accumulate the gradients of the KV tokens. This will have non-associativity issue of floating-point addition. They allocate separate accumulation buffers for each SM, followed by a global deterministic summation across all buffers.
+- **MoE Backward.**
