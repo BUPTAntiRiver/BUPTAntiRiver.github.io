@@ -107,4 +107,9 @@ They use TileLang. And one key point is they pay attention to reproducibility. T
 They also provide _high-performance batch-invariant and deterministic kernel libraries_. Determinism is very important for debugging hardware and software issues. And non-determinism in training typically stems from non-determinism **accumulation order**, often due to the use of atomic addition instructions. Which primarily occurs during the backward pass, and has three main sources:
 
 - **Attention Backward.** In conventional implementation of backward propagation, we use `atomicAdd` to accumulate the gradients of the KV tokens. This will have non-associativity issue of floating-point addition. They allocate separate accumulation buffers for each SM, followed by a global deterministic summation across all buffers.
-- **MoE Backward.**
+- **MoE Backward.** Different experts can write to same buffer on a receiving rank, so this will also have problem of accumulation order.
+- **Matrix Multiplication in mHC.** There is an algorithm in it that will cause non-determinism.
+
+## 3.3. Training Framework
+
+Their training framework is built upon the scalable and efficient infrastructure developed for V3. For V4, we only need to handle some novel architectural components: Muon optimizer, mHC, and the hybrid attention mechanism.
