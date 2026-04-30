@@ -132,4 +132,19 @@ Common activation recompute often has module level granularity, DeepSeek guys ex
 
 ## 3.4. Inference Framework
 
+V4's inference framework largely inherits from that of V3, with some difference in KV Cache management.
 
+## 3.4.1. KV Cache Structure and Management
+
+We have hybrid attention and they are even compressed, also the tail of uncompressed entries still needs to be used. So the scenario in V4 is a bit complex. But we can still handle it, the two main obstacles are:
+
+- Diverse cache policies, such as those used in Sliding Window Attention
+- Constraints imposed by high performance attention kernels, including alignment requirements
+
+**State Cache for SWA and Uncompressed Tail Tokens.** In the report it says we treat SWA and uncompressed tail tokens from the compression branch together, as a state-space model. The corresponding KV cache can thus be regarded as a sequence-specific state that depends solely on the current position. This is quite confusing, why we are talking about state-space model here? This is kind of like a metaphor? It means that the KV cache design for this is independent of sequence length, just like state in state-space models. Because space need in SWA is fixed, and space needed for uncompressed tail is always smaller than group length $m$ or $m'$. So we can fix it.
+
+**Sparse Attention Kernel Co-Design.** Typical high performance kernel assumes a block of fixed number of tokens to optimize performance, but with same number of $B$ tokens, the original amount of tokens in CSA and HCA is difference, so we should choose the number of original token per block to be multiple of $\text{lcm}(m,m')$.
+
+### 3.4.2. On-Disk KV Cache Storage
+
+For compressed KV entries, they are all stored on disk. For uncompressed tail they are not stored. For SWA, they have three strategies, ranging from full store, periodic checkpointing (with tuneable period $p$) and zero store.
