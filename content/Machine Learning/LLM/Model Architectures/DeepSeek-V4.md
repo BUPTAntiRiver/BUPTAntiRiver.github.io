@@ -113,3 +113,23 @@ They also provide _high-performance batch-invariant and deterministic kernel lib
 ## 3.3. Training Framework
 
 Their training framework is built upon the scalable and efficient infrastructure developed for V3. For V4, we only need to handle some novel architectural components: Muon optimizer, mHC, and the hybrid attention mechanism.
+
+### 3.3.1. The Efficient Implementation of Muon
+
+The Muon optimizer requires the full gradient matrix to compute parameter updates, which is challenging when trying to combined with Zero Redundancy Optimizer (ZeRO). Traditional ZeRO is designed for element-wise optimizer like AdamW, where a single parameter matrix can be partitioned and updated across multiple ranks. How to address this?
+
+Their solution is transfer parameter in buckets. We have to sacrifice some part of ZeRO to enable Muon, this is a simple and straight forward solution. They say the overhead is less than 10%, where each rank handles about 5 parameter matrices, which is quite acceptable.
+
+### 3.3.2. Contextual Parallelism for Long-Context Attention
+
+Context Parallelism conventionally splits the sequence dimension, with each rank maintaining contiguous $s$ tokens. But in V4 we have CSA and HCA that compress a group of token, so if there are tails, how to handle them?
+
+They design a **two stage** communication approach. In the **first stage**, each rank $i$ sends its last $m$ uncompressed KV entries to rank $i+1$. Then rank $i+1$ compresses some of these received entries together with its local $s$ uncompressed KV entries, producing a fixed length of $\frac{s}{m} +1$ compressed entries, in which exist some padding entries. In the **second stage**, an all-gather operation across all CP ranks collects the locally compressed KV entries. Then a fused select-and-pad operator reorganizes them into the full set of compressed KV entries with a total length of $\text{cp\_size}\cdot \frac{s}{m}$. Any padding entries are placed at the tail.
+
+### 3.3.3. Extended Automatic Differentiation for Flexible Activation Checkpointing
+
+Common activation recompute often has module level granularity, DeepSeek guys extend it to tensor level. So you can specify what to recompute even inside one module now. Also it has no memory overhead and sacrifice no programming efficiency.
+
+## 3.4. Inference Framework
+
+
