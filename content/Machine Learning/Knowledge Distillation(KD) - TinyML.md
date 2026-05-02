@@ -12,7 +12,9 @@ To create **smaller, faster models** that retain **high accuracy** — ideal for
 
 - Training a small model directly may result in **lower accuracy**.
 - Distillation helps the student learn **not only what is right**, but also **how wrong classes relate to the right one**, improving generalization.
-  Common use cases:
+
+Common use cases:
+
 - Deploying BERT → DistilBERT
 - Compressing ResNet models for mobile
 - Combining ensemble models into one lightweight student

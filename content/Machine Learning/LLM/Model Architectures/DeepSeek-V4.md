@@ -148,3 +148,45 @@ We have hybrid attention and they are even compressed, also the tail of uncompre
 ### 3.4.2. On-Disk KV Cache Storage
 
 For compressed KV entries, they are all stored on disk. For uncompressed tail they are not stored. For SWA, they have three strategies, ranging from full store, periodic checkpointing (with tuneable period $p$) and zero store.
+
+# 4. Pre-Training
+
+## 4.1. Data Construction
+
+They use **_sample level attention mask_** rather than token level mask. Sample level means they might separate an article into multiple samples like one sample is one sentence, and they mask future sentences and give model access to all tokens of current sample. So the model don't have to start prediction from broken pieces. I think this is also aligned with their compressed attention design. The model should compress the information of whole sample rather than inter-splitting broken word piece.
+
+However, anyway, the data is not open-source. In the past I thought that data is actually the most important stuff is model training now, but actually this V4 report do have something more important than its data. It has novel model architecture that brings long context training methods available to everyone. Even though super long context training parquet can be hard to get. So the data still matters a lot.
+
+## 4.2. Other Setups and Stability Tricks
+
+These should be read by algorithm colleagues, I only want to learn about infrastructure part of this report, so we just skip this.
+
+# 5. Post Training
+
+## 5.1. Post-Training Pipeline
+
+We skip this part, it explains some basics of post training.
+
+## 5.2. RL and OPD Infrastructures
+
+### 5.2.1. FP4 Quantization Integration
+
+We apply FP4 (MXFP4) quantization to accelerate both rollouts and all inference-only forward passes, including those of teacher and reference models. For training steps, FP4 quantization is simulated via a lossless FP4-to-FP8 dequantization step, allowing seamless reuse of the existing FP8 mixed-precision framework with FP32 master weights and requiring no modification to the backward pipeline.
+
+### 5.2.2. Efficient Teacher Scheduling for Full-Vocabulary OPD
+
+Their framework supports full-vocabulary On-Policy Distillation (OPD) with an effectively unbounded number of teachers, each potentially comprising trillions of parameters. To enable this, all teachers are **offloaded** to a centralized distributed storage and are loaded on demand during the teacher forward pass with ZeRO-like parameter storage to alleviate both I/O and DRAM pressure.
+
+Further more, naively materializing logits for a vocabulary size $|V|>100\text{k}$ across all teachers is prohibitive. We address this by caching only the last-layer teacher hidden states and reconstruct the full logits on the fly.
+
+Also to mitigate the GPU memory footprint, we order training samples by teacher index during data dispatching to ensure that at most one teacher head resides in device memory at any given time and each teacher head is loaded only once per mini-batch.
+
+### 5.2.3. Sandbox Infrastructure for Agentic AI
+
+There are two other parts between this chapter, but they are not introduced in great detail so I am going to skip them here.
+
+Well, after reading I think I am not going to write it here too. Skip.
+
+# 6. Summary
+
+DeepSeek-V4 brings a general method to achieve ultra-long context language model: use lighter weight attention mechanism to reduce computation cost, so that you can train such model~ They also shared how they were making effort to do optimization and polishing their infrastructure.
