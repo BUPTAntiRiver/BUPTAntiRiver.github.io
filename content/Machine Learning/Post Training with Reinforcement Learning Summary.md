@@ -55,6 +55,8 @@ $$
 
 So we reduce the cost of a value model, only use reward model to calculate the advantage, which improves speed and maintain pretty good performance.
 
+Beyond the reward above, we also have a KL penalty $\beta D_{KL}(\pi_{\theta}||\pi_{\text{ref}})$, where the $\pi_{\text{ref}}$ here is different from $\pi_{\text{old}}$ which generates the trajectories, it is the anchor model, usually the _original SFT model or the checkpoint before RL starts_. It helps us to avoid reward hacking, language degradation and model collapse. Some way to stabilize RL training process.
+
 ## Problems of GRPO
 
 ### Breaking baseline rule
