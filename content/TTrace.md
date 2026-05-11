@@ -13,3 +13,11 @@ Given a distributed training program, how do we tell whether it is correct? One 
 So ideally, we want a systematic differential testing solution that can determine if the distributed implementation matches the reference implementation with much fewer resources like a single iteration of stochastic gradient descent. Also the testing should be more fine-grained so that one can pinpoint the whereabouts of potential silent bugs.
 
 We have two main challenges. The first challenge is how to align the tensors between the candidate and reference implementation. In distributed training employs strategies such as tensor and pipeline parallelism to partition data, models and intermediate results across devices. These sharded tensors can be reordered and physically fragmented in multiple ways, making it **_hard to find the correspondence_** between the candidate and reference. Secondly, it is non-trivial to determine whether the candidate implementation matches the reference based on the numerical tensor values. As **_floating-point arithmetic is non-associate_** due to numerical round-off errors, mathematical equivalent operations with different computation orders in the candidate implementation can can generates different numerical results as the reference.
+
+# Motivations, Challenges and Their Approach
+
+Current industry has been widely using large scale distributed training systems, so they must already has some methods to handle such silent bugs. I mean, they must have right? But their practice is actually usually ad-hoc as always.
+
+## Industry Practice: Ad-Hoc Debugging
+
+The predominant industry practice for training bug detection is based on differential testing that compares a distributed implementation's output to that of a simpler, trusted reference implementation. Bug what to compare? How much deviation is error is usually relying on subjective judgment. While intuitive, such ad-hoc debugging is very inefficient.
