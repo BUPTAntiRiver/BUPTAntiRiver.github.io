@@ -36,3 +36,11 @@ The two main challenges are:
 ### Challenge #1: Mapping of Semantics
 
 Now we have Pipeline Parallelism that partitions layers, Data Parallelism that partitions data batches, Tensor Parallelism, Sequence Parallelism and Context Parallelism that partitions tensors.
+
+TTrace assembles tensor according to the particular parallelization strategies to compare tensors. It achieves this by building a **tensor canonical mapping** system to set up the alignment. Which is user-provided.
+
+### Challenge #2: "Expected" Numerical Errors
+
+How to differentiate _numerical errors from bug-induced errors_? Existing solution sidestep this by casting all tensors to higher precision like FP32 or converting all computations to compute on finite fields, thereby reducing numerical errors to make bug-induced errors more apparent. But implementing such methods for training frameworks can be difficult, since many kernel has hard-coded optimization, and if we bypass these kernels our debugging will drift from practical scenario and become meaningless.
+
+TTrace provides a non-intrusive methods, which is an empirical numerical error tolerance estimation procedure.
