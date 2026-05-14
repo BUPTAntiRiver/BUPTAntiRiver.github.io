@@ -21,3 +21,18 @@ Current industry has been widely using large scale distributed training systems,
 ## Industry Practice: Ad-Hoc Debugging
 
 The predominant industry practice for training bug detection is based on differential testing that compares a distributed implementation's output to that of a simpler, trusted reference implementation. Bug what to compare? How much deviation is error is usually relying on subjective judgment. While intuitive, such ad-hoc debugging is very inefficient.
+
+## Challenges in Verification-Based Methods
+
+Some methods targets on proving semantic equivalence of the computation graphs generated in the distributed and single-device setting. Though it provides a proof that formally establishes the correctness of computation graph, but it is very hard to implement in production.
+
+## How TTrace Addresses the Challenges of Ad-Hoc Debugging?
+
+The two main challenges are:
+
+1. How to map each intermediate tensor in the distributed system to its counterpart in the reference implementation?
+2. As training involves floating point operations, how to distinguish expected numerical errors from bug-induced errors?
+
+### Challenge #1: Mapping of Semantics
+
+Now we have Pipeline Parallelism that partitions layers, Data Parallelism that partitions data batches, Tensor Parallelism, Sequence Parallelism and Context Parallelism that partitions tensors.
