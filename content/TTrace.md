@@ -43,4 +43,22 @@ TTrace assembles tensor according to the particular parallelization strategies t
 
 How to differentiate _numerical errors from bug-induced errors_? Existing solution sidestep this by casting all tensors to higher precision like FP32 or converting all computations to compute on finite fields, thereby reducing numerical errors to make bug-induced errors more apparent. But implementing such methods for training frameworks can be difficult, since many kernel has hard-coded optimization, and if we bypass these kernels our debugging will drift from practical scenario and become meaningless.
 
-TTrace provides a non-intrusive methods, which is an empirical numerical error tolerance estimation procedure.
+TTrace provides a non-intrusive methods, which is an empirical numerical error tolerance estimation procedure. The detail will be introduced later.
+
+# Overview of TTrace Workflow
+
+**Step 1. User annotates the model.** So that we can know how are the weights and modules partitioned across distributed machines.
+
+**Step 2. TTrace estimates the expected numerical errors in the model.**
+
+**Step 3. TTrace runs candidates and reference.** We have a consistent tensor generator to ensure identical inputs and a trace collector to capture target activations and gradients during forward and backward.
+
+**Step 4. TTrace conducts differential testing to test bugs.**
+
+**Step 5. TTrace rewrites module inputs to localize bugs.** A bug in early layer often leads to cascading errors, causing all subsequent layers to diverge from reference. So we rewrite the output for later layers with same input tensor to precisely identify where has problem.
+
+# Error Tolerance Analysis
+
+This part explain the method we mentioned before that can tell the difference between numerical error and real error. They introduce a **perturbation-based proxy** to estimate these errors. Their core insight is that the network's sensitivity towards _internal round off error_ is structurally equivalent to its sensitivity to _input perturbations_.
+
+<!--TODO: explain the math detail-->
