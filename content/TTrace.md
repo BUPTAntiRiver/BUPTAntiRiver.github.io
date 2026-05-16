@@ -61,4 +61,10 @@ TTrace provides a non-intrusive methods, which is an empirical numerical error t
 
 This part explain the method we mentioned before that can tell the difference between numerical error and real error. They introduce a **perturbation-based proxy** to estimate these errors. Their core insight is that the network's sensitivity towards _internal round off error_ is structurally equivalent to its sensitivity to _input perturbations_.
 
-<!--TODO: explain the math detail-->
+We assume the reference full precision implementation as the mathematical continuous one, and let $\hat{F}(X)$ be the FP implementation and $\hat{H}(X)$ be the distributed candidate implementation. We aim to determine whether the observed discrepancy $\|\hat{H}(X)-\hat{F}(X)\|$ is permissible. By the triangle inequality, this discrepancy is bounded by the sum of their individual deviation from the ideal real valued function $F(X)$:
+
+$$
+	\|\hat{H}(X)-\hat{F}(X)\|\leq\|\hat{H}(X)-F(X)\|+\|F(X)-\hat{F}(X)\|
+$$
+
+it would be impossible to calculate the errors relative to the real-valued $F$ exactly. Because we can't have such calculation done by hand, we can only do the computation with computers, which will have limited precision. So we bound the right hand side with another term according to the similarity between input perturbation and internal numerical error. So we use the term $\|\hat{F}(X+\Delta X)-\hat{F}(X)\|$ to replace right hand side. The detailed calculation is shown in the paper, check it there.
