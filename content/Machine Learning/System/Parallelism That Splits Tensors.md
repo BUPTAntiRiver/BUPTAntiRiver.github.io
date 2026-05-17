@@ -1,1 +1,0 @@
-In modern parallel training methods, there are three methods that partitions tensors: Tensor Parallelism (TP), Sequence Parallelism (SP) and Context Parallelism (CP). We will introduce these parallelism in this article.
