@@ -94,7 +94,7 @@ Conclusions are:
 
 ## Algorithm: Chunkwise training
 
-They also developed chunkwise version of GDN, it is too long to be write here.
+They also developed chunkwise version of GDN, it is too long to be written here.
 
 # Experiments
 

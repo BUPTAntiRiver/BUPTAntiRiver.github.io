@@ -1,4 +1,5 @@
 http://arxiv.org/abs/2510.18234
+
 This is an initial investigation into the feasibility of compressing long context via optical 2D mapping. DeepSeek-OCR consists of two components: DeepEncoder and DeepSeek3B-MoE-A570M as the decoder. It can achieve high decoding precision with pretty high compression ratio.
 
 # Introduction
@@ -43,8 +44,11 @@ Consists of 2 components: a visual _perception feature extraction_ component dom
 ### Multiple Resolution Support
 
 It has four **native** resolution supports and **dynamic** resolution supports by combing the native ones. The native ones are done through resizing or padding.
+
 Native means, in this mode, the model process the whole input picture at once by resizing or padding it into demanding resolution shape, then generate corresponding amount of visual tokens.
+
 Dynamic means, the model separate the input picture into smaller pieces and process them in Tiny or Small mode (two modes in native) and generate a whole overview in Base or Large mode (also two modes in native).
+
 These different modes are trained together, besides Gundam-master mode, because it is too large so it is trained alone afterwards.
 
 ## The MoE Decoder
@@ -76,4 +80,5 @@ See the paper for more detail.
 # Conclusion
 
 This paper proposes a very impressive point that is we can compress long context information by compressing the image of the context words. They reached nearly loss-less 10 times compression, and explored substantial new room for research and improvement.
+
 And this kind of image compression is quite similar to human, because when we are reading words, we are actually processing the image our eyes perceived!
