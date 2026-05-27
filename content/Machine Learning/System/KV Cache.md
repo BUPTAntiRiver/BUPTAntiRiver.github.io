@@ -1,6 +1,6 @@
 # What?
 
-KV Cache is a system optimization applied to [[Transformer and LLM|Transformer]], which is exactly the same to self-attention in math.
+KV Cache is a system optimization applied to [[Transformers and LLM|Transformer]], which is exactly the same to self-attention in math.
 
 # Why?
 

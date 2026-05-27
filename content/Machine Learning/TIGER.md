@@ -2,7 +2,7 @@ Paper link: http://arxiv.org/abs/2305.05065
 
 # Introduction
 
-TIGER stands for _[[Transformer and LLM|Transformer]] Index for GEnerative Recommenders_.
+TIGER stands for _[[Transformers and LLM|Transformer]] Index for GEnerative Recommenders_.
 
 # Related Work
 

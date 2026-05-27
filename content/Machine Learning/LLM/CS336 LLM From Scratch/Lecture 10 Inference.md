@@ -1,6 +1,6 @@
 # Review Architecture
 
-[[Transformer and LLM]]
+[[Transformers and LLM]]
 
 There are two stages of inference:
 

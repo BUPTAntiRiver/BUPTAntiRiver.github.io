@@ -14,7 +14,7 @@ Besides masked language model, they also use a "next sentence prediction task" t
 
 There are two steps in the framework of BERT: _pre-training_ and _fine-tuning_. They first pre-train the model with unlabeled data over different pre-training tasks. For fine-tuning, the BERT model is first initialized with the pre-trained parameters, and then all parameters are fine-tuned using labeled data from the downstream tasks. Each downstream task has a separate fine-tuned model, even though they are initialized with same pre-trained parameters.
 
-**Model Architectures.** BERT's implementation is almost identical to the [[Transformer and LLM|original work]], and in this article, we denote the number of layers as $L$, the hidden size as $H$, and the number of self-attention heads as $A$.
+**Model Architectures.** BERT's implementation is almost identical to the [[Transformers and LLM|original work]], and in this article, we denote the number of layers as $L$, the hidden size as $H$, and the number of self-attention heads as $A$.
 
 **Input/Output Representations.** To make BERT handle a variety of downstream tasks, out input representation should be able to unambiguously represent both a single sentence and a pair of sentences (e.g. Question, Answer pairs) in one token sequence. In the context of this work, a "sentence" can be an arbitrary span of _contiguous text_. A "sequence" refers to the input token sequence to BERT, which may be a single sentence or multiple sentences.
 
