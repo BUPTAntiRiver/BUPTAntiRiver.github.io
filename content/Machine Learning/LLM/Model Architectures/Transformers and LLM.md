@@ -64,4 +64,4 @@ We may apply normalization methods like layer norm or [[RMSNorm]].
 
 Current works are done on aspects like how to speed up attention ([[FlashAttention]])? Is there replacement for full attention ([[Linear Attention]], [[Mamba]], [[GDN - Gated Delta Networks]])? Other training methods beyond simple cross entropy loss between ground truth and generated result (SFT)? We have other training methods (RL [[Post-training]]), but how to make it even better? Models becomes bigger how to train them ([[Distributed Training - TinyML]], [[Parallelism That Splits Tensors Inside Models]], [[Pipeline Parallel]])?
 
-Also inference is becoming more and more important and consumes main computing resources now. There are still a lot of treasure to be discovered in the area of modern LLM.
+Also inference is becoming more and more important and consumes main computing resources now. Hardware aware programming and optimization is taking more and more importance. There are still a lot of treasure to be discovered in the area of modern LLM.
