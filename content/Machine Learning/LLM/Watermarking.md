@@ -1,3 +1,29 @@
+# Introduction
+
+Text watermarking is an old topic, we suppose we have the original text $t$, watermark information $w$, watermark algorithm $F$, watermarked text $t_{w}=F(t, w)$, and detect algorithm $D(t_{w})=w$ which can extract watermark information back.
+
+A good watermark can be retrieved clearly and be robust to watermark removal. Also it shouldn't change the semantic meaning of original text too much, which may cause loss of original information and leave an obvious watermarked signal to the reader.
+
+There are a lot of interesting methods to watermark text in the past, but we won't talk about them here, we focus on the newly emerged methods targeting large language model generated text.
+
+Intuitively, these methods work on processes that are only owned by large language models, which are **Model Training, Logits Generation and Token Sampling**.
+
+# How?
+
+We present a model for embedding watermarks in generated content: $\text{Embed}(\mathbf{p},w)\to \mathbf{z}, \text{Generate}(\mathbf{z},\Theta)\to \mathbf{y}$, where $\mathbf{p}$ is prompt, $w$ is watermark, $\mathbf{z}$ is watermarked representation, $\Theta$ is model parameters and $\mathbf{y}$ is final output.
+
+## Training Phase Watermarking
+
+Training phase watermarking embeds a unique identifier $w$ into an LLM by modifying a subset of the training data. Consider an LLM trained on 100 M web-text sentence. To encode a 8-bit string $w=11001000$, we first sample 5% of the training corpus to form $D_{s}$. Two low frequency yet grammatical tokens like "*amber-fern*" (bit 0) and "*azure-reed*" (bit 1) serve as markers. Traversing the bit string left to right, we append the corresponding marker to each sentence in $D_{s}$, producing the watermarked dataset $D_{m}$.
+
+Next, we merge $D_{m}$ with original dataset using a weighting factor $\alpha$ to obtain the final training set $D_{w}$:
+
+$$
+	D_{w} = \alpha \cdot (D\setminus D_{s}) \cup (1-\alpha) \cdot D_{m}.
+$$
+
+An LLM trained on $D_{w}$ becomes $L_{w}$; when prompted with text similar to $D_{m}$, $L_{w}$ reproduces the marker sequence, thereby revealing $w$.
+
 # Resources
 
 ## Surveys and reviews
