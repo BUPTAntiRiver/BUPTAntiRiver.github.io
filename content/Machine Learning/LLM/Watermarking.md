@@ -12,7 +12,7 @@ Intuitively, these methods work on processes that are only owned by large langua
 
 We present a model for embedding watermarks in generated content: $\text{Embed}(\mathbf{p},w)\to \mathbf{z}, \text{Generate}(\mathbf{z},\Theta)\to \mathbf{y}$, where $\mathbf{p}$ is prompt, $w$ is watermark, $\mathbf{z}$ is watermarked representation, $\Theta$ is model parameters and $\mathbf{y}$ is final output.
 
-## Training Phase Watermarking
+## Training Phase
 
 Training phase watermarking embeds a unique identifier $w$ into an LLM by modifying a subset of the training data. Consider an LLM trained on 100 M web-text sentence. To encode a 8-bit string $w=11001000$, we first sample 5% of the training corpus to form $D_{s}$. Two low frequency yet grammatical tokens like "*amber-fern*" (bit 0) and "*azure-reed*" (bit 1) serve as markers. Traversing the bit string left to right, we append the corresponding marker to each sentence in $D_{s}$, producing the watermarked dataset $D_{m}$.
 
@@ -23,6 +23,24 @@ $$
 $$
 
 An LLM trained on $D_{w}$ becomes $L_{w}$; when prompted with text similar to $D_{m}$, $L_{w}$ reproduces the marker sequence, thereby revealing $w$.
+
+## Logits Generation
+
+Watermarking at the logits generation phase embeds a message $w$ by perturbing the logits without touching the model's weights. Assume we wish to hide the 3-bit string $w=101$ in a short reply. Using the KGW method as an example, we first compute for each step $i$, a green vocabulary $G_{i}\in V$ such that roughly $\gamma=0.5$ of the tokens are eligible. When ever the next bit equals 1, we add a small positive bias $\beta$ to every logit in $G_{i}$; when the bit equals 0, all the logits are left unchanged. A detector can later verify that the sequence contains significantly more green tokens than chance would predict, thereby recovering the embedded bits.
+
+This raw implementation might change semantic and the watermark can be hard to extract, so there are more studies have been done to improve these perspectives like: **Semantic Robustness, Optimal, Imperceptibility, Diversity**.
+
+## Token Sampling
+
+Token sampling watermarking is very similar to logits generation watermarking in my opinion, because the probability during sampling is calculated base on logits. But there are still slight differences, since we modify probabilities in this phase but not logits.
+
+In general, a watermark aware sampler uses $\mathbf{o}_{i}=\Sigma_{w}(\text{softmax}(\mathbf{z}^{(i)}),w)$, so that each choice is slightly nudged toward or away from vocabulary indices that represent $w$. One simple implementation scales every probability $p_{j}$ through a weighted function $\delta(w,j)$:
+
+$$
+	\Sigma _{w}(p, w) = \{p_{j}\delta(w,j)|j=1,2,\dots,N\},
+$$
+
+where $N$ is vocabulary size. The shape of $\delta$ governs the trade-off between watermark strength and readability. Some recent works refine the scaling step, converting it from a static process into an adaptive decision mechanism. Like only trigger watermark when the predicted distribution is sufficiently entropic.
 
 # Resources
 
