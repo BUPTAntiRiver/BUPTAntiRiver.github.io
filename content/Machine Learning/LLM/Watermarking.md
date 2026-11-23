@@ -14,7 +14,7 @@ We present a model for embedding watermarks in generated content: $\text{Embed}(
 
 ## Training Phase
 
-Training phase watermarking embeds a unique identifier $w$ into an LLM by modifying a subset of the training data. Consider an LLM trained on 100 M web-text sentence. To encode a 8-bit string $w=11001000$, we first sample 5% of the training corpus to form $D_{s}$. Two low frequency yet grammatical tokens like "*amber-fern*" (bit 0) and "*azure-reed*" (bit 1) serve as markers. Traversing the bit string left to right, we append the corresponding marker to each sentence in $D_{s}$, producing the watermarked dataset $D_{m}$.
+Embeds a unique identifier $w$ into an LLM by modifying a subset of the training data. Consider an LLM trained on 100 M web-text sentence. To encode a 8-bit string $w=11001000$, we first sample 5% of the training corpus to form $D_{s}$. Two low frequency yet grammatical tokens like "*amber-fern*" (bit 0) and "*azure-reed*" (bit 1) serve as markers. Traversing the bit string left to right, we append the corresponding marker to each sentence in $D_{s}$, producing the watermarked dataset $D_{m}$.
 
 Next, we merge $D_{m}$ with original dataset using a weighting factor $\alpha$ to obtain the final training set $D_{w}$:
 
@@ -26,21 +26,37 @@ An LLM trained on $D_{w}$ becomes $L_{w}$; when prompted with text similar to $D
 
 ## Logits Generation
 
-Watermarking at the logits generation phase embeds a message $w$ by perturbing the logits without touching the model's weights. Assume we wish to hide the 3-bit string $w=101$ in a short reply. Using the KGW method as an example, we first compute for each step $i$, a green vocabulary $G_{i}\in V$ such that roughly $\gamma=0.5$ of the tokens are eligible. When ever the next bit equals 1, we add a small positive bias $\beta$ to every logit in $G_{i}$; when the bit equals 0, all the logits are left unchanged. A detector can later verify that the sequence contains significantly more green tokens than chance would predict, thereby recovering the embedded bits.
+Embeds a message $w$ by perturbing the logits without touching the model's weights. Assume we wish to hide the 3-bit string $w=101$ in a short reply. Using the KGW method as an example, we first compute for each step $i$, a green vocabulary $G_{i}\in V$ such that roughly $\gamma=0.5$ of the tokens are eligible. When ever the next bit equals 1, we add a small positive bias $\beta$ to every logit in $G_{i}$; when the bit equals 0, all the logits are left unchanged. A detector can later verify that the sequence contains significantly more green tokens than chance would predict, thereby recovering the embedded bits.
 
 This raw implementation might change semantic and the watermark can be hard to extract, so there are more studies have been done to improve these perspectives like: **Semantic Robustness, Optimal, Imperceptibility, Diversity**.
 
 ## Token Sampling
 
-Token sampling watermarking is very similar to logits generation watermarking in my opinion, because the probability during sampling is calculated base on logits. But there are still slight differences, since we modify probabilities in this phase but not logits.
+Very similar to logits generation watermarking in my opinion, because the probability during sampling is calculated base on logits. But there are still slight differences, since we modify probabilities in this phase but not logits.
 
-In general, a watermark aware sampler uses $\mathbf{o}_{i}=\Sigma_{w}(\text{softmax}(\mathbf{z}^{(i)}),w)$, so that each choice is slightly nudged toward or away from vocabulary indices that represent $w$. One simple implementation scales every probability $p_{j}$ through a weighted function $\delta(w,j)$:
+In general, a watermark aware sampler uses $\mathbf{o}_{i}=\Sigma_{w}(\text{softmax}(\mathbf{z}^{(i)}),w)$, so that each choice is slightly nudged toward or away from vocabulary indices that represent $w$. One simple implementation **scales** every probability $p_{j}$ through a **weighted** function $\delta(w,j)$:
 
 $$
 	\Sigma _{w}(p, w) = \{p_{j}\delta(w,j)|j=1,2,\dots,N\},
 $$
 
 where $N$ is vocabulary size. The shape of $\delta$ governs the trade-off between watermark strength and readability. Some recent works refine the scaling step, converting it from a static process into an adaptive decision mechanism. Like only trigger watermark when the predicted distribution is sufficiently entropic.
+
+## Multimodal
+
+A diff between LLM and traditional text is that LLM can produce multimodal output like image and audio. However the methods are quite similar to previous ones, we can embed watermark through training or logits generation. A hybrid technique about other modals (except text) is to combine spatial and frequency domain methods to increase watermark robustness. Spatial domain watermarking alters the pixel values of images of images or audio waveform, while frequency domain techniques, embed the watermark in the spectral coefficients.
+
+## Attacks on Watermarking Techniques
+
+Adversarial strategies against LLM watermarking aim to **degrade** or **remove** the **watermark** **without** compromising model utility. Formally, an attack function $\mathcal{A}(\Theta,w)=\Theta_{A}$ modifies the original parameters $\Theta$ to yield $\Theta_{A}$. Documented attacks fall into four categories:
+
+1. Fine-tuning and parameter perturbation. Keep training on auxiliary data to overwrite watermark-carrying directions. Empirical evidence shows even short or low-rank fine-tuning can drastically lower detection confidence while keeping perplexity nearly unchanged.
+2. Model inversion and reconstruction. Finding what are the watermarks by solving:
+$$
+	D_{\text{inv}}=\arg \min_{D'}||\Theta(D')-\Theta||^{2}.
+$$
+3. Perturbations. Crafting input that flips the watermark decision while preserving semantics.
+4. Collusion and model aggregation. Multiple parties blend parameters diluting individual watermarks without harming downstream performance. 
 
 # Resources
 
