@@ -1,7 +1,0 @@
-[[Lecture 06 Machine-Level Programming 2 Control]]
-[[Lecture 07 Machine-Level Programming 3 Procedures]]
-[[Lecture 08 Machine-Level Programming 4 Data]]
-[[Lecture 09 Machine-Level Programming 5 Advanced Topics]]
-[[Lecture 10 Programme Optimization]]
-[[Lecture 11 Memory Hierarchy]]
-[[Lecture 12 Cache Memories]]
