@@ -58,6 +58,14 @@ $$
 3. Perturbations. Crafting input that flips the watermark decision while preserving semantics.
 4. Collusion and model aggregation. Multiple parties blend parameters diluting individual watermarks without harming downstream performance. 
 
+# Challenges
+
+Two main concerns about LLM watermarking are: watermark embedding overhead and robustness to adversarial attacks. The overhead can be calculated directly but adversarial attacks have various forms. For example, attackers may fine-tune the model on other datasets, prune parameters, or use knowledge distillation. Another **challenge** is the **detection and extraction** of watermark. We need to extract the watermark to prove authority but if it is easy to extract, it might also be easy to detect, so malicious attackers can find the hidden watermark and attempt to remove it.
+
+Also, from previous discussion we can see that the detection of watermark is not deterministic, so to what extent we can say the watermark exists is also very important, or it can be misused like false positives, fake watermark and so on. To mitigate these risks, **safeguards** have been proposed like: rigorous detection threshold with publicly disclosed error-rate targets; multiple independent detectors; version controlled audit logs that record watermarking parameters.
+
+Two promising future paths are: dynamic watermarking and watermark benchmark. Dynamic watermarking can make the watermark more resilient and robust to attacks and modifications, while benchmark provides convincing standards and metrics to prove and compare effectiveness of different watermark approaches.
+
 # Resources
 
 ## Surveys and reviews

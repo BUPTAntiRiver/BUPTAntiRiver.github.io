@@ -35,3 +35,7 @@ After this pass, you should understand main content of the paper, if you don't t
 ## The third pass
 
 To fully understand a paper, you may try to _virtually re-implement_ the paper, which means: making the same assumptions as the authors, re-create the work.
+
+# New Method
+
+We can just send the paper link to LLM.
