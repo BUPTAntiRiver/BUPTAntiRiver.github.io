@@ -1,1 +1,9 @@
 * text=auto eol=lf
+
+# Vendored Obsidian plugin bundles and theme CSS are third-party build artifacts.
+# Mark them vendored so they do not dominate GitHub language stats, and skip them
+# in diffs so `npx quartz sync` output stays readable.
+content/.obsidian/plugins/*/main.js linguist-vendored -diff
+content/.obsidian/plugins/*/styles.css linguist-vendored
+content/.obsidian/plugins/*/default-misspellings.md linguist-vendored -diff
+content/.obsidian/themes/*/theme.css linguist-vendored -diff

@@ -17,7 +17,10 @@ const config: QuartzConfig = {
     },
     locale: "en-US",
     baseUrl: "quartz.jzhao.xyz",
-    ignorePatterns: ["private", "templates", ".obsidian"],
+    // `.obsidian/**` on top of `.obsidian`: the live-preview watcher matches ignore
+    // patterns per file with minimatch, and a bare directory name does not match
+    // nested paths — without it, editing vault settings triggers rebuilds.
+    ignorePatterns: ["private", "templates", ".obsidian", ".obsidian/**"],
     defaultDateType: "modified",
     theme: {
       fontOrigin: "googleFonts",

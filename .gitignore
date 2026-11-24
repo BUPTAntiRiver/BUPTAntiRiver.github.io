@@ -4,8 +4,14 @@ node_modules
 public
 prof
 tsconfig.tsbuildinfo
-.obsidian
 .quartz-cache
 private/
 .replit
 replit.nix
+
+# Obsidian: the vault config is tracked so settings, themes and plugins follow the repo.
+# Only per-device state (pane layout, cache, deleted notes) stays out of git.
+content/.obsidian/workspace.json
+content/.obsidian/workspace-mobile.json
+content/.obsidian/cache
+content/.obsidian/.trash/
