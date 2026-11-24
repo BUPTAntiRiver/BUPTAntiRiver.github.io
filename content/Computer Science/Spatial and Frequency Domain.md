@@ -68,9 +68,9 @@ Each coefficient $F(u,v)$ is **complex**, so it carries two pieces of informatio
 - the **magnitude** $|F(u,v)|$, which says how much of that frequency is present;
 - the **phase** $\arg F(u,v)$, which says where in space that frequency component sits.
 
-Here $u$ counts cycles across the width and $v$ cycles down the height. The index $u \in [0, M/2]$ therefore encodes the positive frequency $u/M$ cycles per pixel, up to the Nyquist limit of $0.5$; indices above $M/2$ wrap around to the corresponding negative frequencies.
+The right panel keeps the magnitude and drops the phase. The distinction matters: the transform is not the lossy step. $F(u,v)$ in full is a lossless, invertible representation of the image, whereas the **displayed spectrum** is a lossy projection of it, and from $|F|$ alone one recovers the image's autocorrelation rather than the image itself.
 
-The right panel keeps the magnitude and discards the phase. That is precisely why the spectrum cannot be inverted back into the photograph.
+Here $u$ counts cycles across the width and $v$ cycles down the height. The index $u \in [0, M/2]$ therefore encodes the positive frequency $u/M$ cycles per pixel, up to the Nyquist limit of $0.5$; indices above $M/2$ wrap around to the corresponding negative frequencies.
 
 ## Step 3: Compress the Dynamic Range
 
@@ -91,7 +91,7 @@ By default the DFT stores $u = v = 0$ at index $(0,0)$, so the spectrum appears 
 With the spectrum centered, the figure becomes legible:
 
 | What you see                        | What it means                                                                                    |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------ |
+|-------------------------------------|--------------------------------------------------------------------------------------------------|
 | Bright point at the center          | The DC term, i.e. the mean brightness of the whole image                                         |
 | Brightness falling off with radius  | Natural images carry most of their energy in low frequencies                                     |
 | Faint grain near the edges          | High-frequency content: grass texture, film grain, noise                                         |

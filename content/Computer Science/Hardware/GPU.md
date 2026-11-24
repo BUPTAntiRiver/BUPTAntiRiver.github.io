@@ -25,7 +25,7 @@ The `blockDim` variable is a struct with three unsigned integer fields ($x,y$ an
 ## Declaration of Host/Device Function
 
 | keyword      | call on | execute on | executed by                |
-| ------------ | ------- | ---------- | -------------------------- |
+|--------------|---------|------------|----------------------------|
 | `__global__` | host    | device     | new grid of device threads |
 | `__device__` | device  | device     | caller device thread       |
 | `__host__`   | host    | host       | caller host thread         |
