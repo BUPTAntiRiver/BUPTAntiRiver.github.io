@@ -85,4 +85,4 @@ The distributed training strategy is put a full STEM table on each node, shall b
 
 # Third Pass
 
-Note that, STEM is not conflict with MoE, because STEM is a FFN replacement method, and MoE is actually a lot of FFNs, they are orthogonal approaches to scale up model paramters. So each FFN in MoE can also be STEM, then we get a _Mixture of STEM Experts_.
+Note that, STEM is not conflict with MoE, because STEM is a FFN replacement method, and MoE is actually a lot of FFNs, they are orthogonal approaches to scale up model parameters. So each FFN in MoE can also be STEM, then we get a _Mixture of STEM Experts_.

@@ -1,3 +1,9 @@
+---
+aliases:
+  - RAG
+tags:
+---
+
 # What is RAG?
 
 RAG was created in order to solve knowledge intensive problems, like those problems that we need to search the Wikipedia. Though in traditional transformer models we can just fuse all knowledge into parameters without any outer information resource, however, when this augmented structure was added, model performs much better. It showed that we can expand and revise the knowledge easily, and accessed knowledge can be inspected and interpreted. There are also less "hallucinations".
