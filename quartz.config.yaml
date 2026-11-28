@@ -8,7 +8,7 @@ configuration:
   analytics:
     provider: plausible
   locale: en-US
-  baseUrl: quartz.jzhao.xyz
+  baseUrl: buptantiriver.github.io
   ignorePatterns:
     - private
     - templates
@@ -113,7 +113,9 @@ plugins:
   - source: "@quartz-community/og-image"
     enabled: true
   - source: "@quartz-community/cname"
-    enabled: true
+    # off: the emitted CNAME would carry baseUrl, and this site is served at the
+    # *.github.io host, not a custom domain
+    enabled: false
   - source: "@quartz-community/canvas-page"
     enabled: true
   - source: "@quartz-community/content-page"
