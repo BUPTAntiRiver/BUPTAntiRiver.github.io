@@ -1,0 +1,82 @@
+/* Red / Black palette on top of AnuPpuccin.
+ *
+ * AnuPpuccin builds every colour as  rgb(var(--ctp-base))  with a chain
+ *   --ctp-base: var(--ctp-custom-base, var(--ctp-ext-base, <flavour default>))
+ * so overriding --ctp-custom-* re-colours the whole theme without touching
+ * the flavour classes.
+ *
+ * This file is the single source of truth for both Obsidian and the site:
+ *   - Obsidian: enabled as a CSS snippet in appearance.json
+ *   - Quartz:   passed to @quartz-themes/core via `snippets:`
+ */
+
+/* ── dark: ink black with ember red ─────────────────────────────────────── */
+.theme-dark {
+  /* backgrounds, darkest → lightest */
+  --ctp-custom-crust: 4, 4, 6;
+  --ctp-custom-mantle: 9, 9, 11;
+  --ctp-custom-base: 12, 12, 14;
+  --ctp-custom-surface0: 22, 22, 26;
+  --ctp-custom-surface1: 30, 30, 35;
+  --ctp-custom-surface2: 40, 40, 46;
+
+  /* muted text and lines */
+  --ctp-custom-overlay0: 62, 62, 69;
+  --ctp-custom-overlay1: 88, 88, 96;
+  --ctp-custom-overlay2: 120, 120, 129;
+  --ctp-custom-subtext0: 150, 147, 144;
+  --ctp-custom-subtext1: 186, 182, 178;
+  --ctp-custom-text: 233, 229, 225;
+
+  /* accents — --ctp-accent drives --color-accent, links, selection, graphs.
+     !important because AnuPpuccin's accent is a class (.ctp-accent-rosewater)
+     and the theme plugin applies its default class above a plain .theme-dark. */
+  --ctp-accent: var(--ctp-red) !important;
+  --ctp-custom-red: 229, 72, 77;
+  --ctp-custom-maroon: 190, 45, 55;
+  --ctp-custom-peach: 235, 120, 90;
+  --ctp-custom-yellow: 230, 180, 90;
+  --ctp-custom-green: 140, 180, 130;
+  --ctp-custom-teal: 120, 180, 170;
+  --ctp-custom-sky: 130, 175, 205;
+  --ctp-custom-sapphire: 110, 160, 200;
+  --ctp-custom-blue: 120, 150, 200;
+  --ctp-custom-lavender: 190, 170, 200;
+  --ctp-custom-mauve: 214, 160, 180;
+  --ctp-custom-pink: 240, 160, 170;
+  --ctp-custom-flamingo: 238, 190, 186;
+  --ctp-custom-rosewater: 245, 224, 220;
+}
+
+/* ── light: warm paper with crimson ink ─────────────────────────────────── */
+.theme-light {
+  --ctp-custom-crust: 226, 218, 210;
+  --ctp-custom-mantle: 238, 231, 224;
+  --ctp-custom-base: 248, 244, 239;
+  --ctp-custom-surface0: 240, 234, 227;
+  --ctp-custom-surface1: 231, 223, 215;
+  --ctp-custom-surface2: 219, 209, 200;
+
+  --ctp-custom-overlay0: 170, 160, 151;
+  --ctp-custom-overlay1: 145, 135, 126;
+  --ctp-custom-overlay2: 118, 109, 101;
+  --ctp-custom-subtext0: 105, 96, 90;
+  --ctp-custom-subtext1: 76, 69, 64;
+  --ctp-custom-text: 48, 43, 40;
+
+  --ctp-accent: var(--ctp-red) !important;
+  --ctp-custom-red: 179, 37, 44;
+  --ctp-custom-maroon: 150, 28, 34;
+  --ctp-custom-peach: 190, 90, 60;
+  --ctp-custom-yellow: 170, 120, 40;
+  --ctp-custom-green: 90, 130, 95;
+  --ctp-custom-teal: 70, 130, 125;
+  --ctp-custom-sky: 70, 120, 150;
+  --ctp-custom-sapphire: 60, 105, 140;
+  --ctp-custom-blue: 70, 95, 150;
+  --ctp-custom-lavender: 140, 110, 150;
+  --ctp-custom-mauve: 160, 100, 130;
+  --ctp-custom-pink: 190, 90, 120;
+  --ctp-custom-flamingo: 210, 130, 120;
+  --ctp-custom-rosewater: 220, 180, 170;
+}
