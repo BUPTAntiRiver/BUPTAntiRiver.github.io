@@ -262,10 +262,9 @@ plugins:
       outputPath: static/encryptedContentIndex.json
     order: 900
   - source: "@quartz-community/stacked-pages"
-    enabled: true
-    options:
-      maxTabs: 8
-      animateTransitions: true
+    # off: renders vertical "binder" spines on both edges, which reads as
+    # sideways text next to the content. Re-enable only with custom CSS.
+    enabled: false
     layout:
       position: afterBody
       priority: 50
