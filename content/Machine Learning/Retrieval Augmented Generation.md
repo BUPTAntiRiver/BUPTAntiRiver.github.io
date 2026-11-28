@@ -1,7 +1,6 @@
 ---
 aliases:
   - RAG
-tags:
 ---
 
 # What is RAG?
