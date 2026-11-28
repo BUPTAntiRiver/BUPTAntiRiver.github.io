@@ -1,0 +1,1 @@
+Mutable means the attributes of the object can be changed, while immutable objects are different, when you want to modify immutable objects it actually returns a brand new object with attributes that satisfies the changes.

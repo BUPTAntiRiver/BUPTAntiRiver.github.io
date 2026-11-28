@@ -1,0 +1,1 @@
+ELF, Executable and Linkable Format, which is developed by Unix System Laboratories, is a common standard file format for executable files, object code, shared libraries, and core dumps. It is widely used in Unix and Unix-like systems on x86 processors.

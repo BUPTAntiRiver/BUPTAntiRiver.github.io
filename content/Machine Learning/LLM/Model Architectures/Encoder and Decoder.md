@@ -1,0 +1,1 @@
+The key difference between Encoder and Decoder is that, encoder only takes the input sequence as input, then generate some output. But decoder first takes in the input sequence and generates the output continuing after the input sequence, then repeats such procedure.
