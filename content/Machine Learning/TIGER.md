@@ -36,7 +36,3 @@ In the paper, they use **RQ-VAE for Semantic IDs.** The VAE part means that we f
 ## Generative Retrieval with Semantic IDs
 
 We construct item sequences for every user by sorting chronologically the items they have interacted with. Then given sequence (item-1 to item-n), we replace items with $m$-length Semantic ID, it becomes $(c_{1,0},\dots, c_{1,m-1},\dots,c_{n,0},\dots, c_{n,m-1})$. The model is then trained to predict the Semantic ID of item-n+1. There might be cases that _invalid_ Semantic IDs are generated, but statistics show that it rarely happens, also they can handle it with methods like discard or beam search filtering.
-
-# Simple Reimplement
-
-I vibecoded a simple reimplement project, it performs a bit better that direct embedding similarity search, but the parameters I used wasn't well tuned, and the size of model is too small, and the coding agent has some illusion, which says paper Semantic ID size is only 10,000. So the simple reimplement do show that TIGER should be the SOTA of that time.

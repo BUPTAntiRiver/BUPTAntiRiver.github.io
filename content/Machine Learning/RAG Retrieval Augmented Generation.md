@@ -66,7 +66,13 @@ Can be seen as a standard autoregressive seq2seq generator with transition proba
 
 ### RAG-Sequence
 
-The likelihood $p(y|x)$ does not break into a conventional per-token likelihood, hence we cannot solve it with a single beam search. We need to care about the $(z,y)$ pairs, so we run beam search for each document $z$, scoring each hypothesis $y$ using $p_{\theta}(y_{i}|x,z,y_{1:i-1})$. This yields a set of hypothesis, we call it $Y$, and some of which may not have appeared in the beams of all documents. Let me explain this, suppose $z_{a}$ gets $y_{a}$ and $z_{b}$ gets $y_{b}$, we have result of $p(y_{a}|x,z_{a})$ and $p(y_{b}|x,z_{b})$ during beam search but to get marginalized result $p(y_{a}|x)$ and $p(y_{b}|x)$ we also need $p(y_{a}|x,z_{b})$ and $p(y_{b}|x,z_{a})$, so we need an additional teacher-forced run for all of these scenario.
+The likelihood $p(y|x)$ does not break into a conventional per-token likelihood, hence we cannot solve it with a single beam search. We need to care about the $(z,y)$ pairs, so we run beam search for each document $z$, scoring each hypothesis $y$ using $p_{\theta}(y_{i}|x,z,y_{1:i-1})$. This yields a set of hypothesis, we call it $Y$, and some of which may not have appeared in the beams of all documents. Let me explain this, suppose $z_{a}$ gets $y_{a}$ and $z_{b}$ gets $y_{b}$, we have result of $p(y_{a}|x,z_{a})$ and $p(y_{b}|x,z_{b})$ during beam search but to get marginalized result $p(y_{a}|x)$ and $p(y_{b}|x)$ we also need $p(y_{a}|x,z_{b})$ and $p(y_{b}|x,z_{a})$, so we need an additional teacher-forced run for all of these scenario. And now we can sum the probabilities across beams. We refer to this decoding procedures as "**Thorough Decoding**."
+
+For longer output sequences, $|Y|$ can be very large, requiring many forward passes, so we have "**Fast Decoding**", which makes a further approximation that $p_{\theta}(y|x,z_{i})\approx 0$ where $y$ was not generated during beam search from $x,z_{i}$.
+
+# Further Discussion
+
+RAG is a prototype model, so how is it nowadays? With thriving agent works everywhere? How is RAG integrated into agent? It seems like we only see tool calls now.
 
 # Materials
 
