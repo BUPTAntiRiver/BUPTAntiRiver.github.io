@@ -186,13 +186,23 @@ plugins:
       priority: 5
       condition: not-index
   - source: "@quartz-community/comments"
-    enabled: false
+    enabled: true
     options:
       provider: giscus
-      options: {}
+      options:
+        repo: BUPTAntiRiver/BUPTAntiRiver.github.io
+        repoId: R_kgDOQ7qlcw
+        category: Announcements
+        categoryId: DIC_kwDOQ7qlc84DMLKn
+        mapping: pathname
+        strict: true
+        reactionsEnabled: true
+        inputPosition: bottom
+        lang: en
     layout:
       position: afterBody
       priority: 10
+      condition: not-index
   - source: "@quartz-community/footer"
     enabled: true
     options:
@@ -203,7 +213,15 @@ plugins:
       position: footer
       priority: 50
   - source: "@quartz-community/recent-notes"
-    enabled: false
+    enabled: true
+    options:
+      title: Recently updated
+      limit: 6
+      showTags: true
+    layout:
+      position: afterBody
+      priority: 40
+      condition: is-index
   - source: "@quartz-community/spacer"
     enabled: true
     options: {}
@@ -244,7 +262,10 @@ plugins:
       outputPath: static/encryptedContentIndex.json
     order: 900
   - source: "@quartz-community/stacked-pages"
-    enabled: false
+    enabled: true
+    options:
+      maxTabs: 8
+      animateTransitions: true
     layout:
       position: afterBody
       priority: 50
@@ -265,11 +286,13 @@ layout:
     folder:
       exclude:
         - reader-mode
+        - comments
       positions:
         right: []
     tag:
       exclude:
         - reader-mode
+        - comments
       positions:
         right: []
     canvas: {}
